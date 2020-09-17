@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<title><%= room %> - <%= id %></title>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<link href="/colorbox.css" rel="stylesheet"/>
+<script src="/jquery.colorbox-min.js"></script>
+<script src="/common.js"></script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<link rel="shortcut icon" href="/icon.png" type="image/png"/>
+<link rel="icon" href="/icon.png" type="image/png"/>
+<link rel="apple-touch-icon" href="/icon.png"/>
+
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="Qoodle"/>
+
+<style type="text/css">
+html, body{
+  text-align: center;
+  background-color: #fafafa;
+  font-size: 20px;
+  color: #333;
+}
+.mycanvas{
+  border: 1px solid #333;
+}
+.card-columns{
+  column-count: 1;
+}
+.card-group .card{
+  max-width: calc(100%);
+}
+#open16_table{
+  background-repeat: no-repeat;
+  background-size: 100% 100%
+}
+.num_panel{
+  width: 15%;
+  height: 100px;
+  color: #fff;
+  background-color: #006;
+  border-style: solid;
+  border-width: 2px;
+  text-align: center;
+  opacity: 0.6;
+}
+</style>
+</head>
+<body>
+
+<h1><%= id %></h1>
+
+<div class="container">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>#</th><th>category</th></th><th>image</th><th>body</th>
+      </tr>
+    </thead>
+    <tbody id="quizlist_tbody">
+    </tbody>
+  </table>
+</div>
+
+<div class="container p-3" id="quiz_body">
+  <ul class="nav nav-tabs">
+    <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active">出題画面</a></li>
+    <li class="nav-item"><a href="#tab-pane-answers" data-toggle="tab" class="nav-link">解答画面</a></li>
+  </ul>
+  <div class="tab-content">
+    <div id="tab-pane-quiz" class="tab-pane active">
+    </div>
+    <div id="tab-pane-answers" class="tab-pane">
+      <div id="card-groups">
+        <!--
+        <div class="card-group" id="cards-1">
+        </div>
+        -->
+      </div>
+
+      <button id="showAnswersBtn" class="btn btn-primary" onClick="showAnswers();">Show</button>
+      <button id="hideAnswersBtn" class="btn btn-primary" onClick="hideAnswers();" style="display: none">Hide</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal bd-example-modal-lg fade" id="answersModal" tabindex="-1" role="dialog" aria-labbelledby="answersModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="answersModalLabel"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="answersmodal-body">
+        <table class="table table-bordered">
+          <tbody id="answers_body">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer btn-center">
+        <!--
+        <button type="button" class="btn btn-info btn-xs py-0" onClick="migrateFrom();"><i class="fas fa-file-export"></i></button>
+        -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var uuid = generateUUID();
+var socketio = null;
+var socket_ids = [];
+
+var base_url = location.origin + '/';
+
+var cards = [];    //. カード
+var imgs = {};     //. 画像データ
+
+var quiz_point = 0;
+var image_category = -1;
+var image_blur = -1;
+var blur_ratio = 1;
+var image_16_open = 0;
+var _quiz_id = null;
+
+$(function(){
+  socketio = io.connect();
+
+  init();
+
+  $.ajax({
+    type: 'GET',
+    url: '/dbapi/quizset/<%= id %>',
+    success: function( result ){
+      if( result && result.status && result.body && result.body.quiz_ids ){
+        for( var i = 0; i < result.body.quiz_ids.length; i ++ ){
+          var quiz_id = result.body.quiz_ids[i];
+          var tr = '<tr id="quiz_' + quiz_id + '">'
+            + '<td>' + ( i + 1 ) + '</td>'
+            + '<td id="quizcat_' + quiz_id + '">&nbsp;</td>'
+            + '<td id="quizimg_' + quiz_id + '">&nbsp;</td>'
+            + '<td id="quizbody_' + quiz_id + '"></td>'
+            + '</tr>';
+          $('#quizlist_tbody').append( tr );
+
+          $.ajax({
+            type: 'GET',
+            url: '/dbapi/quiz/' + quiz_id,
+            success: function( qresult ){
+              if( qresult && qresult.status && qresult.body ){
+                //console.log( 'quiz_id = ' + quiz_id + ', _id = ' + qresult.body._id );
+                var cat = ['一般','フリーテキスト','16分割','ぼかし'][qresult.body.category];
+                $('#quizcat_'+qresult.body._id).html( cat );
+                var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\');">' + qresult.body.body + '</a>';
+                $('#quizbody_'+qresult.body._id).html( a );
+                if( qresult.body.img_url ){
+                  var img = '<img src="' + qresult.body.img_url + '" width="100"/>';
+                  $('#quizimg_'+qresult.body._id).html( img );
+                }
+              }
+            },
+            error: function( e0, e1, e2 ){
+              console.log( e0, e1, e2 );
+            }
+          });
+        }
+      }
+    },
+    fail: function( e0, e1, e2 ){
+      console.log( e0, e1, e2 );
+    }
+  });
+
+  var msg = {
+    uuid: uuid,
+    room: '<%= room %>',
+    timestamp: ( new Date() ).getTime()
+  };
+  socketio.json.emit( 'init_admin', msg );
+
+  socketio.on( 'init_admin_view', function( msg ){
+    console.log( 'init_admin_view', msg );
+  });
+  socketio.on( 'init_share_view', function( msg ){
+    console.log( 'init_share_view', msg );
+  });
+
+  socketio.on( 'init_client_view', function( msg ){
+    var socket_id = msg.uuid; //msg.socket_id;
+    if( socket_ids.indexOf( socket_id ) > -1 ){
+    }else{
+      socket_ids.push( socket_id );
+      //$('#debug_ul').append( '<li id="socket_' + socket_id + '">' + socket_id + '</li>' );
+      console.log( socket_ids );
+
+      var color = generateColor( msg.name );
+
+      $('#card-groups').html( '' );
+      $.colorbox.remove();
+
+      //. カード追加
+      var card = '<div id="card_' + socket_id + '" class="card border-' + color + '" style="cursor: pointer;">'
+        + '<div class="card-body text-' + color + '">'
+        //+ '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="btn btn-xs btn-' + color + '" onClick="removeCard(\'card_' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
+        + '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="my_a btn btn-xs btn-' + color + '" onClick="selectSocket(\'' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
+        + '</div>'
+        + '<a href="#box_content" id="box_content_' + socket_id + '" title="' + msg.name + '">'
+        + '<img class="card-img-bottom" id="image_' + socket_id + '" alt="(image of ' + msg.name + ')" ts="' + msg.timestamp + '"/>'
+        + '</a>'
+        + '</div>';
+      cards.push( card );
+
+      //. カードグループを必要数だけ追加
+      appendCardGroups( '#card-groups', cards.length );
+    }
+  });
+
+  socketio.on( 'image_client_view', function( msg ){
+    var socket_id = msg.uuid; //msg.socket_id;
+    if( socket_ids.indexOf( socket_id ) > -1 ){
+      var ts = $('#image_'+socket_id).attr( 'ts' );
+      ts = parseInt( ts );
+
+      if( msg.timestamp > ts ){
+        $('#image_'+socket_id).prop( 'src', msg.image_src );
+        $('#image_'+socket_id).prop( 'title', msg.comment );
+        $('#image_'+socket_id).prop( 'ts', msg.timestamp );
+
+        //. 再描画用に記録
+        var img = {
+          src: msg.image_src,
+          title: msg.comment,
+          ts: msg.timestamp
+        };
+        imgs[socket_id] = img;
+
+        var zoom_socket_id = $('#zoom_image').attr( 'socket_id' );
+        if( zoom_socket_id && zoom_socket_id == socket_id ){
+          $('#zoom_image').prop( 'src', msg.image_src );
+        }
+      }
+    }
+  });
+
+  socketio.on( 'quiz_select_view', function( msg ){
+    $('body').removeClass( 'modal-open' );
+    $('.modal-backdrop').remove();
+    $('#answerModal').modal( 'hide' );
+
+    $('.card').removeClass( 'border-secondary' );
+    $('.card').removeClass( 'border-warning' );
+    $('.card').removeClass( 'border-success' );
+    $('.my_a').removeClass( 'btn-secondary' );
+    $('.my_a').removeClass( 'btn-warning' );
+    $('.my_a').removeClass( 'btn-success' );
+
+    setTimeout( function(){
+      var quiz_id = msg.quiz_id;
+      _quiz_id = quiz_id;
+      $.ajax({
+        type: 'GET',
+        url: '/dbapi/quiz/' + quiz_id,
+        success: function( result ){
+          if( result && result.status && result.body ){
+            //var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\');">' + qresult.body.body + '</a>';
+            var html = '<h3>' + result.body.body + '</h3>';
+            if( result.body.img_url ){
+              if( result.body.category != 2 ){
+                html += '<div><img id="q_image" src="' + result.body.img_url + '" width="100%"/></div>';
+              }else{
+                html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
+              }
+            }
+
+            switch( result.body.category ){
+            case 0:
+              //. 一般クイズ
+              break;
+            case 1:
+              //. フリーテキスト出題
+              break;
+            case 2:
+              //. 16分割クイズ
+              break;
+            case 3:
+              //. ぼかしクイズ
+              html += '<br/>'
+                + '<input id="rng" type="range" value="10" min="0" max="9" step="1" onInput="changeBlur();"/> <span id="range_value">10</span>';
+              break;
+            }
+
+            html += '</div>';
+
+            $('#tab-pane-quiz').html( html );
+            if( result.body.category == 3 ){
+              var e = document.getElementById( 'q_image' );
+              var iid = setInterval( function(){
+                if( e.complete ){
+                  blur_ratio = Math.floor( e.naturalWidth / 100 );
+                  clearInterval( iid );
+                }
+              }, 500 );
+              changeBlur();
+            }else if( result.body.category == 2 ){
+              image_16_open = 0;
+              for( var i = 0; i < 4; i ++ ){
+                var tr = '<tr id="board_row_' + i + '">';
+                for( var j = 0; j < 4; j ++ ){
+                  var num = ( i * 4 + j + 1 );
+                  var td = '<td id="panel_' + num + '" class="num_panel" onClick="open16_click(' + num + ');">' + num + '</td>';
+                  tr += td;
+                }
+                tr += '</tr>';
+                $('#open16_table').append( tr );
+              }
+            }
+          }
+        },
+        error: function( e0, e1, e2 ){
+          console.log( e0, e1, e2 );
+        }
+      });
+
+    }, 200 );
+  });
+
+  socketio.on( 'quiz_hint_view', function( msg ){
+    console.log( 'quiz_hint_view', msg );
+  });
+
+  socketio.on( 'quiz_finish_view', function( msg ){
+    console.log( 'quiz_finish_view', msg );
+  });
+
+  socketio.on( 'quiz_fixed_view', function( msg ){
+    console.log( 'quiz_fixed_view', msg );
+    var target_uuid = msg.uuid;
+    var target_quiz_id = msg.quiz_id;
+    var target_quizset_id = msg.quizset_id;
+    $('#card_'+target_uuid).removeClass( 'border-secondary' );
+    $('#card_'+target_uuid).removeClass( 'border-success' );
+    $('#a_'+target_uuid).removeClass( 'btn-secondary' );
+    $('#a_'+target_uuid).removeClass( 'btn-success' );
+    $('#card_'+target_uuid).addClass( 'border-warning' );
+    $('#a_'+target_uuid).addClass( 'btn-warning' );
+  });
+
+  socketio.on( 'quiz_correct_view', function( msg ){
+    console.log( 'quiz_correct_view', msg );
+    selectCard( msg );
+  });
+});
+
+function init(){
+  //. リサイズ時
+  //$(window).on( 'load resize', function(){
+    resized();
+  //});
+}
+
+function resized(){
+  var browserWidth = window.innerWidth;
+  var browserHeight = window.innerHeight;
+
+  //socketio.emit( 'init_admin', { room: '<%= room %>', width: browserWidth, height: browserHeight } );
+}
+
+function selectSocket( socket_id ){
+  //. もう一度選択したらキャンセルできるようにしたい
+  var s = $('#card_'+socket_id).hasClass( 'border-success');
+  if( s ){
+    $('#card_'+socket_id).removeClass( 'border-success');
+    $('#card_'+socket_id).addClass( 'border-warning');
+    $('#a_'+socket_id).removeClass( 'btn-success');
+    $('#a_'+socket_id).addClass( 'btn-warning');
+    socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: false } );
+  }else{
+    $('#card_'+socket_id).removeClass( 'border-warning');
+    $('#card_'+socket_id).addClass( 'border-success');
+    $('#a_'+socket_id).removeClass( 'btn-warning');
+    $('#a_'+socket_id).addClass( 'btn-success');
+    socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: true } );
+  }
+}
+
+function removeCard( card_id ){
+  $('#'+card_id).css( 'display', 'none' );
+
+  //. card_id = 'card_XXXXXX';
+  var socket_id = card_id.substr( 6 );
+  if( imgs[socket_id] ){
+    delete imgs[socket_id];
+  }
+
+  var b = true;
+  for( var i = 0; i < cards.length && b; i ++ ){
+    var card = cards[i];
+    if( card.indexOf( 'card_' + socket_id ) > -1 && card.indexOf( 'image_' + socket_id ) > -1 ){
+      cards.splice( i, 1 );
+      b = false;
+    }
+  }
+}
+
+function zoomImage( socket_id ){
+  if( socket_id ){
+    //console.log( 'zoomImage: socket_id = ' + socket_id );
+    $('#box_content').html( '<img id="zoom_image" socket_id="' + socket_id + '" src="' + $('#image_'+socket_id).prop( 'src' ) + '"/>' );
+  }
+}
+
+
+//. num 個の要素をなるべく正方形に近い表形式の card-group 化する
+function appendCardGroups( cardgroups_selector, num ){
+  //. 近づける正方形の一辺の長さ
+  var m = Math.ceil( Math.sqrt( num ) );
+  //. m 個の card-group が必要
+  for( var i = 0; i < m; i ++ ){
+    $(cardgroups_selector).append( '<div class="card-group" id="cards-' + i + '">' );
+  }
+  //. ( m * m ) の正方形の中に表示する
+  for( var i = 0; i < num; i ++ ){
+    var card = cards[i];
+    var row = Math.floor( i / m );
+    $('#cards-'+row).append( card );
+  }
+
+  //. クラスでまとめて ColorBox の指定
+  //$('.card').colorbox({ href: '#box_content', inline: true, transition: 'none', width: "90%", innerHeight: "90%", onOpen: function(){ var socket_id = $(this).prop( 'id' ).substr( 5 ); zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
+
+  if( num % m ){
+    var row = Math.floor( num / m );
+    for( var i = num; i % m > 0; i ++ ){
+      var dummycard = '<div class="card"></div>';
+      $('#cards-'+row).append( dummycard );
+    }
+  }
+
+  //. 画像再描画
+  Object.keys( imgs ).forEach( function( socket_id ){
+    var img = imgs[socket_id];
+    //console.log( 'appendCardGroups: socket_id = ' + socket_id, img );
+
+    $('#image_'+socket_id).prop( 'src', img.src );
+    $('#image_'+socket_id).prop( 'title', img.title );
+    $('#image_'+socket_id).prop( 'ts', img.ts );
+  });
+}
+
+function selectQuiz( quiz_id ){
+  console.log( 'selectQuiz: quiz_id = ' + quiz_id );
+  socketio.emit( 'quiz_select', { room: '<%= room %>', quiz_id: quiz_id, quizset_id: '<%= id %>' } );
+}
+
+function showAnswers(){
+  $('#showAnswersBtn').css( 'display', 'none' );
+  $('#hideAnswersBtn').css( 'display', 'block' );
+  socketio.emit( 'show_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+}
+
+function hideAnswers(){
+  $('#showAnswersBtn').css( 'display', 'block' );
+  $('#hideAnswersBtn').css( 'display', 'none' );
+  socketio.emit( 'hide_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+}
+
+function changeBlur(){
+  var b = parseInt( $('#rng').val() );
+  $('#range_value').html( ( b + 1 ) );
+  var t = $('#q_image')[0];
+  t.style['-ms-filter'] = 'blur(' + ( b * blur_ratio ) + 'px)';
+  t.style['filter'] = 'blur(' + ( b * blur_ratio ) + 'px)';
+
+  //. blur の値を WebSocket で通知する
+  socketio.emit( 'quiz_hint', { room: '<%= room %>', category: 3, blur: b, ratio: blur_ratio } );
+}
+
+function open16_click( num ){
+  var o = $('#panel_'+num).css( 'opacity' );
+  if( o == '0.6' ){
+    $('#panel_'+num).css( 'border-width', '1px' );
+    $('#panel_'+num).css( 'opacity', '0.3' );
+
+    //. ヒントの数を WebSocket で通知する
+    image_16_open ++;
+    socketio.emit( 'quiz_hint', { room: '<%= room %>', category: 2, num: num, open: image_16_open } );
+  }
+}
+</script>
+</body>
+</html>

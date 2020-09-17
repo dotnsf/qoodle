@@ -1,0 +1,665 @@
+swagger: '2.0'
+info:
+  description: Qoodle API ドキュメント
+  version: 0.0.1
+  title: Qoodle REST APIs
+host: localhost:8080
+basePath: /dbapi
+tags:
+  - name: quiz
+    description: Quiz related API
+  - name: quizset
+    description: Quizset related API
+  - name: answer
+    description: Answer related API
+  - name: image
+    description: Image related API
+schemes:
+  - http
+  - https
+paths:
+  /quizs:
+    get:
+      tags:
+        - quiz
+      summary: クイズ複数取得
+      description: クイズ複数取得
+      produces:
+        - application/json
+      parameters:
+        - name: user_id
+          type: string
+          in: query
+          description: user id
+        - name: limit
+          type: integer
+          in: query
+          description: limit
+        - name: offset
+          type: integer
+          in: query
+          description: offset
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /quiz:
+    post:
+      tags:
+        - quiz
+      summary: クイズ作成
+      description: クイズ作成
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/QuizRequest'
+#        - name: category
+#          type: integer
+#          in: formData
+#          description: 0 一般クイズ（お絵描き解答含む）, 1 フリーテキストで出題, 2 16分割, 3 ぼかし
+#        - name: point
+#          type: integer
+#          in: formData
+#          description: 得点
+#        - name: body
+#          type: string
+#          in: formData
+#          description: 出題内容
+#        - name: comment
+#          type: string
+#          in: formData
+#          description: コメント（クイズ画面には非表示）
+#        - name: img_url
+#          type: string
+#          in: formData
+#          description: 画像を使うクイズの画像URL
+#        - name: user_id
+#          type: string
+#          in: formData
+#          description: ユーザーID
+#        - name: user_name
+#          type: string
+#          in: formData
+#          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /quiz/{id}:
+    get:
+      tags:
+        - quiz
+      summary: クイズ取得
+      description: クイズ取得
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: Quiz ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    put:
+      tags:
+        - quiz
+      summary: クイズ更新
+      description: クイズ更新
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: Quiz ID
+          required: true
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/QuizRequest'
+#        - name: category
+#          type: integer
+#          in: formData
+#          description: 0 一般クイズ（お絵描き解答含む）, 1 フリーテキストで出題, 2 16分割, 3 ぼかし
+#        - name: point
+#          type: integer
+#          in: formData
+#          description: 得点
+#        - name: body
+#          type: string
+#          in: formData
+#          description: 出題内容
+#        - name: comment
+#          type: string
+#          in: formData
+#          description: コメント（クイズ画面には非表示）
+#        - name: img_url
+#          type: string
+#          in: formData
+#          description: 画像を使うクイズの画像URL
+#        - name: user_id
+#          type: string
+#          in: formData
+#          description: ユーザーID
+#        - name: user_name
+#          type: string
+#          in: formData
+#          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    delete:
+      tags:
+        - quiz
+      summary: クイズ削除
+      description: クイズ削除
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: Quiz ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /quizsets:
+    get:
+      tags:
+        - quizset
+      summary: クイズセット複数取得
+      description: クイズセット複数取得
+      produces:
+        - application/json
+      parameters:
+        - name: user_id
+          type: string
+          in: query
+          description: user id
+        - name: limit
+          type: integer
+          in: query
+          description: limit
+        - name: offset
+          type: integer
+          in: query
+          description: offset
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /quizset:
+    post:
+      tags:
+        - quizset
+      summary: クイズセット作成
+      description: クイズセット作成
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/QuizsetRequest'
+#        - name: quiz_ids
+#          type: array
+#          in: formData
+#          description: クイズIDの配列
+#        - name: user_id
+#          type: string
+#          in: formData
+#          description: ユーザーID
+#        - name: user_name
+#          type: string
+#          in: formData
+#          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /quizset/{id}:
+    get:
+      tags:
+        - quizset
+      summary: クイズセット取得
+      description: クイズセット取得
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: Quizset ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    put:
+      tags:
+        - quizset
+      summary: クイズセット更新
+      description: クイズセット更新
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: Quizset ID
+          required: true
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/QuizsetRequest'
+#        - name: quiz_ids
+#          type: array
+#          in: formData
+#          description: クイズIDの配列
+#        - name: user_id
+#          type: string
+#          in: formData
+#          description: ユーザーID
+#        - name: user_name
+#          type: string
+#          in: formData
+#          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    delete:
+      tags:
+        - quizset
+      summary: クイズセット削除
+      description: クイズセット削除
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: Quizset ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /answers:
+    get:
+      tags:
+        - answer
+      summary: 解答複数取得
+      description: 解答複数取得
+      produces:
+        - application/json
+      parameters:
+        - name: user_id
+          type: string
+          in: query
+          description: user id
+        - name: quizset_id
+          type: string
+          in: query
+          description: quizset id
+        - name: limit
+          type: integer
+          in: query
+          description: limit
+        - name: offset
+          type: integer
+          in: query
+          description: offset
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /answer:
+    post:
+      tags:
+        - answer
+      summary: 解答作成
+      description: 解答作成
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/AnswerRequest'
+#        - name: quiz_id
+#          type: string
+#          in: formData
+#          description: クイズID
+#        - name: quizset_id
+#          type: string
+#          in: formData
+#          description: クイズセットID
+#        - name: image_id
+#          type: string
+#          in: formData
+#          description: 画像ID
+#        - name: point
+#          type: integer
+#          in: formData
+#          description: 得点
+#        - name: user_id
+#          type: string
+#          in: formData
+#          description: ユーザーID
+#        - name: user_name
+#          type: string
+#          in: formData
+#          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /answer/{id}:
+    get:
+      tags:
+        - answer
+      summary: 解答取得
+      description: 解答取得
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: 解答 ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    put:
+      tags:
+        - answer
+      summary: 解答更新
+      description: 解答更新
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: 解答 ID
+          required: true
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/AnswerRequest'
+#        - name: quiz_id
+#          type: string
+#          in: formData
+#          description: クイズID
+#        - name: quizset_id
+#          type: string
+#          in: formData
+#          description: クイズセットID
+#        - name: image_id
+#          type: string
+#          in: formData
+#          description: 画像ID
+#        - name: point
+#          type: integer
+#          in: formData
+#          description: 得点
+#        - name: user_id
+#          type: string
+#          in: formData
+#          description: ユーザーID
+#        - name: user_name
+#          type: string
+#          in: formData
+#          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    delete:
+      tags:
+        - answer
+      summary: 解答削除
+      description: 解答削除
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: 解答 ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /images:
+    get:
+      tags:
+        - image
+      summary: 画像複数取得
+      description: 画像複数取得
+      produces:
+        - application/json
+      parameters:
+        - name: user_id
+          type: string
+          in: query
+          description: user id
+        - name: limit
+          type: integer
+          in: query
+          description: limit
+        - name: offset
+          type: integer
+          in: query
+          description: offset
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /image:
+    post:
+      tags:
+        - image
+      summary: 画像作成
+      description: 画像作成
+      produces:
+        - application/json
+      parameters:
+        - name: file
+          in: formData
+          type: file
+          required: true
+          description: 画像ファイル
+        - name: quiz_id
+          in: formData
+          type: string
+          required: true
+          description: クイズID
+        - name: quizset_id
+          in: formData
+          type: string
+          required: true
+          description: クイズセットID
+        - name: user_id
+          in: formData
+          type: string
+          required: true
+          description: ユーザーID
+        - name: user_name
+          in: formData
+          type: string
+          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+  /image/{id}:
+    get:
+      tags:
+        - image
+      summary: 画像取得
+      description: 画像取得
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: 画像ID
+        - name: view
+          type: string
+          in: query
+          description: 指定時は画像バイナリを返す
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    put:
+      tags:
+        - image
+      summary: 画像更新
+      description: 画像更新
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: 画像 ID
+          required: true
+        - name: file
+          in: formData
+          type: file
+          required: true
+          description: 画像ファイル
+        - name: quiz_id
+          in: formData
+          type: string
+          required: true
+          description: クイズID
+        - name: quizset_id
+          in: formData
+          type: string
+          required: true
+          description: クイズセットID
+        - name: user_id
+          in: formData
+          type: string
+          required: true
+          description: ユーザーID
+        - name: user_name
+          in: formData
+          type: string
+          description: ユーザー名
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+    delete:
+      tags:
+        - image
+      summary: 画像削除
+      description: 画像削除
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          type: string
+          in: path
+          description: 画像 ID
+          required: true
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
+definitions:
+  QuizRequest:
+    type: object
+    properties:
+      category:
+        type: integer
+        description: 0 一般クイズ（お絵描き解答含む）, 1 フリーテキストで出題, 2 16分割, 3 ぼかし
+      point:
+        type: integer
+        description: 得点
+      body:
+        type: string
+        description: 出題内容
+      comment:
+        type: string
+        description: コメント（クイズ画面には非表示）
+      img_url:
+        type: string
+        description: 画像を使うクイズの画像URL
+      user_id:
+        type: string
+        description: ユーザーID
+      user_name:
+        type: string
+        description: ユーザー名
+  QuizsetRequest:
+    type: object
+    properties:
+      quiz_ids:
+        type: array
+        description: クイズIDの配列
+      user_id:
+        type: string
+        description: ユーザーID
+      user_name:
+        type: string
+        description: ユーザー名
+  AnswerRequest:
+    type: object
+    properties:
+      quiz_id:
+        type: string
+        description: クイズID
+      quizset_id:
+        type: string
+        description: クイズセットID
+      image_id:
+        type: string
+        description: 画像ID
+      point:
+        type: integer
+        description: 得点
+      user_id:
+        type: string
+        description: ユーザーID
+      user_name:
+        type: string
+        description: ユーザー名

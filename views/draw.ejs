@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<title><%= room %></title>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<link href="//use.fontawesome.com/releases/v5.8.1/css/all.css" rel="stylesheet"/>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/common.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<link rel="shortcut icon" href="/icon.png" type="image/png"/>
+<link rel="icon" href="/icon.png" type="image/png"/>
+<link rel="apple-touch-icon" href="/icon.png"/>
+
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="Qoodle Share"/>
+
+<!-- // OGP tags -->
+<meta property="og:title" content="Qoodle"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://qoodle.mybluemix.net/"/>
+<meta property="og:image" content="https://qoodle.mybluemix.net/icon.png"/>
+<meta property="og:site_name" content="Qoodle"/>
+<meta property="og:description" content="Qoodle : クイズプラットフォーム"/>
+<!-- OGP tags // -->
+
+<!-- // Twitter Card -->
+<meta property="twitter:card" content="summary"/>
+<meta property="twitter:site" content="@dotnsf"/>
+<meta property="twitter:creator" content="@dotnsf"/>
+<meta property="twitter:url" content="https://qoodle.mybluemix.net/"/>
+<meta property="twitter:image" content="https://qoodle.mybluemix.net/icon.png"/>
+<meta property="twitter:title" content="Qoodle"/>
+<meta property="twitter:description" content="Qoodle : クイズプラットフォーム"/>
+<!-- Twitter Card // -->
+
+<style type="text/css">
+html, body{
+  text-align: center;
+  background-color: #fafafa;
+  font-size: 20px;
+  color: #333;
+}
+#mycanvas{
+  border: 1px solid #333;
+}
+#comment{
+  width: 100%;
+}
+#main_{
+  border: 1px solid;
+}
+.fixed{
+  background-color: #ff8;
+}
+.correct{
+  background-color: #8f8;
+}
+</style>
+</head>
+<body>
+<div id="main">
+
+<h3 id="name"><%= name %></h3>
+
+<select id="select_color" name="select_color">
+  <option style="color:black;" value="transparent"><%= __('common.color.transparent') %></option>
+  <option style="color:black;" value="black" selected="selected"><%= __('common.color.black') %></option>
+  <option style="color:lightgray;" value="white"><%= __('common.color.white') %></option>
+  <option style="color:red;" value="red"><%= __('common.color.red') %></option>
+  <option style="color:blue;" value="blue"><%= __('common.color.blue') %></option>
+  <option style="color:green;" value="green"><%= __('common.color.green') %></option>
+  <option style="color:yellow;" value="yellow"><%= __('common.color.yellow') %></option>
+  <option style="color:cyan;" value="cyan"><%= __('common.color.cyan') %></option>
+  <option style="color:magenta;" value="magenta"><%= __('common.color.magenta') %></option>
+  <option style="color:gray;" value="gray"><%= __('common.color.gray') %></option>
+  <option style="color:#ef8f9c;" value="#ef8f9c"><%= __('common.color.pink') %></option>
+  <option style="color:#ead2ad;" value="#ead2ad"><%= __('common.color.beige') %></option>
+  <option style="color:#7c6035;" value="#7c6035"><%= __('common.color.brown') %></option>
+</select>
+
+<select id="select_linewidth" name="select_linewidth">
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5" selected="selected">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+
+<input type="button" class="btn btn-xs btn-secondary p-0" id="setbg_btn" value="<%= __('common.button.background') %>" onClick="setBG();"/>
+
+<div id="canvas_div">
+  <div id="cdiv"></div>
+
+  <br/>
+  <input type="button" class="btn btn-xs" id="undo_btn" value="<" onClick="undo();" disabled="disabled"/>
+  <input type="button" class="btn btn-xs btn-warning" value="<%= __('common.button.reset') %>" onClick="resetCanvas();"/>
+  <input type="button" class="btn btn-xs btn-primary" id="save_btn" value="<%= __('common.button.send') %>" onClick="save();"/>
+  <input type="button" class="btn btn-xs" id="redo_btn" value=">" onClick="redo();" disabled="disabled"/>
+</div>
+
+<div class="modal bd-example-modal-lg fade" id="commentModal" tabindex="-1" role="dialog" aria-labbelledby="commentModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="commentModalLabel"><%= __('common.comment') %></h4>
+      </div>
+      <div class="modal-body" id="commentmodal-body">
+        <textarea id="comment"></textarea>
+      </div>
+      <div class="modal-footer btn-center">
+        <button type="button" class="btn btn-primary modal_button" data-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var uuid = generateUUID();
+var socketio = null;
+
+var base_url = location.origin + '/';
+var undos = [];
+var redos = [];
+var stroke = null; //. { color: color, width: width, xys: [] }
+var backgroundcolor = null;
+
+var started = false;
+var locked = false;
+var quiz_id = null;
+var quizset_id = null;
+
+//. 参考: https://gist.github.com/Cartman0/436459b9b85cfdd1ca9c
+$(function(){
+  //. ヒストリバック無効化
+  if( window.history && window.history.pushState ){
+    history.pushState( "nohb", null, null );
+    $(window).on( "popState", function( evt ){
+      if( !event.originalEvent.state ){
+        history.pushState( "nohb", null, null );
+        return;
+      }
+    });
+  }
+
+  socketio = io.connect();
+
+  init();
+
+  socketio.on( 'quiz_select_view', function( msg ){
+    started = true;
+    locked = false;
+    quiz_id = msg.quiz_id;
+    quizset_id = msg.quizset_id;
+    console.log( 'quiz_select_view', msg );
+    $('#main').removeClass( 'fixed' );
+    $('#main').removeClass( 'correct' );
+    resetCanvas();
+  });
+
+  socketio.on( 'quiz_hint_view', function( msg ){
+    console.log( 'quiz_hint_view', msg );
+  });
+
+  socketio.on( 'quiz_finish_view', function( msg ){
+    console.log( 'quiz_finish_view', msg );
+  });
+
+  socketio.on( 'quiz_fixed_view', function( msg ){
+    console.log( 'quiz_fixed_view', msg );
+  });
+
+  socketio.on( 'quiz_correct_view', function( msg ){
+    var target_uuid = msg.socket_id;
+    if( target_uuid == uuid ){
+      console.log( 'quiz_correct_view', msg );
+      if( msg.correct ){
+        $('#main').addClass( 'correct' );
+      }else{
+        $('#main').removeClass( 'correct' );
+      }
+    }
+  });
+});
+
+function init(){
+  $('#comment').html( '' );
+  $('#cdiv').html( '<canvas width="80%" height="50%" id="mycanvas"></canvas>' );
+
+  var canvas = document.getElementById( 'mycanvas' );
+  if( !canvas || !canvas.getContext ){
+    return false;
+  }
+  var ctx = canvas.getContext( '2d' );
+  //. マウスの座標を取得
+  var mouse = {
+    startX: 0,
+    startY: 0,
+    x: 0,
+    y: 0,
+    color: "black",
+    isDrawing: false
+  };
+  var borderWidth = 1;
+  canvas.addEventListener( "mousemove", function( e ){
+    if( !locked ){
+    //. マウスが動いたら座標値を取得
+    var rect = e.target.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left - borderWidth;
+    mouse.y = e.clientY - rect.top - borderWidth;
+
+    //. isDrawがtrueのとき描画
+    if( mouse.isDrawing ){
+      var color = $('#select_color').val();
+      if( color == 'transparent' ){
+        ctx.globalCompositeOperation = 'destination-out';
+      }else{
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = parseInt( $('#select_linewidth').val() );
+      ctx.lineCap = 'round';
+      ctx.moveTo( mouse.startX, mouse.startY );
+      ctx.lineTo( mouse.x, mouse.y );
+      if( color != 'transparent' ){
+        ctx.strokeStyle = color;
+      }
+      ctx.stroke();
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
+
+      if( stroke ){
+        stroke.xys.push( [ mouse.x, mouse.y ] );
+      }
+    }
+    }
+  });
+  //. マウスを押したら、描画OK(myDrawをtrue)
+  canvas.addEventListener( "mousedown", function( e ){
+    if( !locked ){
+    mouse.isDrawing = true;
+    mouse.startX = mouse.x;
+    mouse.startY = mouse.y;
+
+    stroke = {};
+    stroke.color = $('#select_color').val();
+    stroke.width = parseInt( $('#select_linewidth').val() );
+    stroke.xys = [ [ mouse.x, mouse.y ] ];
+    }
+  });
+  //. マウスを上げたら、描画禁止(myDrawをfalse)
+  canvas.addEventListener( "mouseup", function( e ){
+    if( !locked ){
+    mouse.isDrawing = false;
+    sendImage();
+
+    if( stroke ){
+      undos.push( stroke );
+      $('#undo_btn').prop( 'disabled', false );
+      stroke = null;
+      redos = [];
+      $('#redo_btn').prop( 'disabled', true );
+    }
+    }
+  });
+  canvas.addEventListener( 'mouseleave', function( e ){
+    if( !locked ){
+    mouse.isDrawing = false;
+
+    if( stroke ){
+      undos.push( stroke );
+      $('#undo_btn').prop( 'disabled', false );
+      stroke = null;
+      redos = [];
+      $('#redo_btn').prop( 'disabled', true );
+    }
+    }
+  });
+
+  canvas.addEventListener( "touchmove", function( e ){
+    if( !locked ){
+    //. タッチが動いたら座標値を取得
+    var t = e.changedTouches[0];
+    var rect = e.target.getBoundingClientRect();
+    //mouse.x = e.pageX - rect.left - borderWidth;
+    //mouse.y = e.pageY - rect.top - borderWidth;
+    mouse.x = ( isAndroid() ? t.pageX : e.pageX ) - rect.left - borderWidth;
+    mouse.y = ( isAndroid() ? t.pageY : e.pageY ) - rect.top - borderWidth;
+
+    //. isDrawがtrueのとき描画
+    if( mouse.isDrawing ){
+      var color = $('#select_color').val();
+      if( color == 'transparent' ){
+        ctx.globalCompositeOperation = 'destination-out';
+      }else{
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = parseInt( $('#select_linewidth').val() );
+      ctx.lineCap = 'round';
+      ctx.moveTo( mouse.startX, mouse.startY );
+      ctx.lineTo( mouse.x, mouse.y );
+      if( color != 'transparent' ){
+        ctx.strokeStyle = color;
+      }
+      ctx.stroke();
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
+
+      if( stroke ){
+        stroke.xys.push( [ mouse.x, mouse.y ] );
+      }
+    }
+    }
+  });
+  //. タッチしたら、描画OK(myDrawをtrue)
+  canvas.addEventListener( "touchstart", function( e ){
+    if( !locked ){
+    var t = e.changedTouches[0];
+    var rect = t.target.getBoundingClientRect();
+    mouse.isDrawing = true;
+    mouse.startX = t.pageX - rect.left - borderWidth;
+    mouse.startY = t.pageY - rect.top - borderWidth;
+
+    stroke = {};
+    stroke.color = $('#select_color').val();
+    stroke.width = parseInt( $('#select_linewidth').val() );
+    stroke.xys = [ [ mouse.startX, mouse.startY ] ];
+    }
+  });
+  //. タッチを上げたら、描画禁止(myDrawをfalse)
+  canvas.addEventListener( "touchend", function( e ){
+    if( !locked ){
+    mouse.isDrawing = false;
+    sendImage();
+
+    if( stroke ){
+      undos.push( stroke );
+      $('#undo_btn').prop( 'disabled', false );
+      stroke = null;
+      redos = [];
+      $('#redo_btn').prop( 'disabled', true );
+    }
+    }
+  });
+  canvas.addEventListener( 'touchcancel', function( e ){
+    if( !locked ){
+    mouse.isDrawing = false;
+    sendImage();
+
+    if( stroke ){
+      undos.push( stroke );
+      $('#undo_btn').prop( 'disabled', false );
+      stroke = null;
+      redos = [];
+      $('#redo_btn').prop( 'display', true );
+    }
+    }
+  });
+
+  //. Pointer Events
+  canvas.addEventListener( "pointermove", function( e ){
+    if( !locked ){
+    //. ポインターが動いたら座標値を取得
+    var t = e; //e.changedTouches[0];
+    var rect = e.target.getBoundingClientRect();
+    //mouse.x = e.pageX - rect.left - borderWidth;
+    //mouse.y = e.pageY - rect.top - borderWidth;
+    mouse.x = ( isAndroid() ? t.pageX : e.pageX ) - rect.left - borderWidth;
+    mouse.y = ( isAndroid() ? t.pageY : e.pageY ) - rect.top - borderWidth;
+
+    //. isDrawがtrueのとき描画
+    if( mouse.isDrawing ){
+      var color = $('#select_color').val();
+      if( color == 'transparent' ){
+        ctx.globalCompositeOperation = 'destination-out';
+      }else{
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = parseInt( $('#select_linewidth').val() );
+      ctx.lineCap = 'round';
+      ctx.moveTo( mouse.startX, mouse.startY );
+      ctx.lineTo( mouse.x, mouse.y );
+      if( color != 'transparent' ){
+        ctx.strokeStyle = color;
+      }
+      ctx.stroke();
+      mouse.startX = mouse.x;
+      mouse.startY = mouse.y;
+
+      if( stroke ){
+        stroke.xys.push( [ mouse.x, mouse.y ] );
+      }
+    }
+    }
+  });
+  //. ポインターにタッチしたら、描画OK(myDrawをtrue)
+  canvas.addEventListener( "pointerdown", function( e ){
+    if( !locked ){
+    var t = e; //e.changedTouches[0];
+    var rect = t.target.getBoundingClientRect();
+    mouse.isDrawing = true;
+    mouse.startX = t.pageX - rect.left - borderWidth;
+    mouse.startY = t.pageY - rect.top - borderWidth;
+
+    stroke = {};
+    stroke.color = $('#select_color').val();
+    stroke.width = parseInt( $('#select_linewidth').val() );
+    stroke.xys = [ [ mouse.startX, mouse.startY ] ];
+    }
+  });
+  //. ポインターを上げたら、描画禁止(myDrawをfalse)
+  canvas.addEventListener( "pointerup", function( e ){
+    if( !locked ){
+    mouse.isDrawing = false;
+    sendImage();
+
+    if( stroke ){
+      undos.push( stroke );
+      $('#undo_btn').prop( 'disabled', false );
+      stroke = null;
+      redos = [];
+      $('#redo_btn').prop( 'disabled', true );
+    }
+    }
+  });
+
+  $('#select_color').change( function(){
+    var color = $(this).val();
+    if( color == 'white' ){
+      color = 'lightgray';
+    }else if( color == 'transparent' ){
+      color = 'black';
+    }
+    $(this).css( { 'color': color } );
+    $('#select_linewidth').css( { 'color': color } );
+    $('#setbg_btn').css( { 'background': color } );
+  });
+
+  //. リサイズ時に Canvas サイズを変更する
+  $(window).on( 'load resize', function(){
+    resized();
+  });
+
+  //. スクロール禁止
+  /*
+  $(window).on('touchmove.noScroll', function( e ){
+    e.preventDefault();
+  });
+  */
+  var movefun = function( event ){
+    event.preventDefault();
+  }
+  window.addEventListener( 'touchmove', movefun, { passive: false } );
+}
+
+function resized(){
+  var browserWidth = window.innerWidth;
+  var browserHeight = window.innerHeight;
+  var canvas = document.getElementById( 'mycanvas' );
+  if( canvas && canvas.getContext ){
+    canvas.width = browserWidth * 0.8;
+    canvas.height = browserHeight * 0.6;
+
+    //. 初期化を通知
+    var name = $('#name').text();
+    var msg = {
+      uuid: uuid,
+      room: '<%= room %>',
+      name: name,
+      timestamp: ( new Date() ).getTime(),
+      width: canvas.width,
+      height: canvas.height
+    };
+    socketio.json.emit( 'init_client', msg );
+  }
+}
+
+function resetCanvas( no_reset_unredo ){
+  init();
+  resized();
+
+  if( !no_reset_unredo ){
+    undos = [];
+    redos = [];
+    backgroundcolor = null;
+
+    //. リセットを通知
+    sendImage();
+  }
+}
+
+function isAndroid(){
+  return ( navigator.userAgent.indexOf( 'Android' ) > 0 );
+}
+
+function save(){
+  var canvas = document.getElementById( 'mycanvas' );
+  if( !canvas || !canvas.getContext ){
+    return false;
+  }
+  var ctx = canvas.getContext( '2d' );
+
+  //. 画像データ
+  var png = canvas.toDataURL( 'image/png' );
+  png = png.replace( /^.*,/, '' );
+
+  //. バイナリ変換
+  var bin = atob( png );
+  var buffer = new Uint8Array( bin.length );
+  for( var i = 0; i < bin.length; i ++ ){
+    buffer[i] = bin.charCodeAt( i );
+  }
+  var blob = new Blob( [buffer.buffer], {
+    type: 'image/png'
+  });
+
+  //. フォームにして送信
+  console.log( 'Sending data... : ' + blob.size );
+  var formData = new FormData();
+  formData.append( 'image', blob );    //. <form enctype='multipart/formdata'><input name='image' type='file'/> ...
+  //formData.append( 'timestamp', ( new Date() ).getTime() );
+  formData.append( 'quiz_id', quiz_id );
+  formData.append( 'quizset_id', quizset_id );
+  formData.append( 'user_id', uuid );
+  formData.append( 'user_name', $('#name').text() );
+  $.ajax({
+    type: 'POST',
+    url: '/dbapi/image',
+    data: formData,
+    contentType: false,
+    processData: false,
+    success: function( data, dataType ){
+      console.log( data );
+
+      if( started ){
+        locked = true;
+
+        var msg = {
+          uuid: uuid,
+          room: '<%= room %>',
+          name: name,
+          quiz_id: quiz_id,
+          quizset_id: quizset_id,
+          timestamp: ( new Date() ).getTime()
+        };
+        socketio.json.emit( 'quiz_fixed', msg );
+        $('#main').addClass('fixed');
+      }
+    },
+    error: function( jqXHR, textStatus, errorThrown ){
+      console.log( textStatus + ': ' + errorThrown );
+    }
+  });
+}
+
+function undo(){
+  if( undos && undos.length > 0 ){
+    var last_stroke = undos.pop();
+    if( undos.length == 0 ){
+      $('#undo_btn').prop( 'disabled', true );
+    }
+    redos.push( last_stroke );
+    $('#redo_btn').prop( 'disabled', false );
+
+    redrawCanvas();
+  }
+}
+
+function redo(){
+  if( redos && redos.length > 0 ){
+    var last_stroke = redos.pop();
+    if( redos.length == 0 ){
+      $('#redo_btn').prop( 'disabled', true );
+    }
+    undos.push( last_stroke );
+    $('#undo_btn').prop( 'disabled', false );
+
+    redrawCanvas();
+  }
+}
+
+function setBG(){
+  var color = $('#select_color').val();
+  if( color ){
+    if( color != 'transparent' ){
+      backgroundcolor = color;
+    }else{
+      backgroundcolor = null;
+    }
+    redrawCanvas();
+  }
+}
+
+function redrawCanvas(){
+  if( undos && undos.length >= 0 ){
+    resetCanvas( true );
+
+    if( backgroundcolor ){
+      var canvas = document.getElementById( 'mycanvas' );
+      if( !canvas || !canvas.getContext ){
+        return false;
+      }
+      var ctx = canvas.getContext( '2d' );
+
+      //. 全体をベタ塗り
+      ctx.beginPath();
+      ctx.fillStyle = backgroundcolor; //"rgb( 255, 255, 255 )";
+      ctx.fillRect( 0, 0, canvas.width, canvas.height );
+      ctx.stroke();
+    }
+
+    for( var i = 0; i < undos.length; i ++ ){
+      var stroke = undos[i];
+
+      for( var j = 1; j < stroke.xys.length; j ++ ){
+        var canvas = document.getElementById( 'mycanvas' );
+        if( !canvas || !canvas.getContext ){
+          return false;
+        }
+        var ctx = canvas.getContext( '2d' );
+
+        var color = stroke.color;
+        if( color == 'transparent' ){
+          ctx.globalCompositeOperation = 'destination-out';
+        }else{
+          ctx.globalCompositeOperation = 'source-over';
+        }
+
+        ctx.beginPath();
+        ctx.lineWidth = stroke.width;
+        ctx.lineCap = 'round';
+        ctx.moveTo( stroke.xys[j-1][0], stroke.xys[j-1][1] );
+        ctx.lineTo( stroke.xys[j][0], stroke.xys[j][1] );
+        if( color != 'transparent' ){
+          ctx.strokeStyle = color;
+        }
+        ctx.stroke();
+      }
+    }
+  }
+
+  sendImage();
+}
+
+function sendImage(){
+  //. キャンバスを取得
+  var canvas = document.getElementById( 'mycanvas' );
+  if( !canvas || !canvas.getContext ){
+    return false;
+  }
+
+  //. 画像データ
+  var png = canvas.toDataURL( 'image/png' );
+
+  //. コメント
+  var comment = $('#comment').val();
+  if( !comment ){ comment = ''; }
+
+  //. 画像を通知
+  var msg = {
+    uuid: uuid,
+    room: '<%= room %>',
+    comment: comment,
+    timestamp: ( new Date() ).getTime(),
+    image_src: png
+  };
+  socketio.json.emit( 'image_client', msg );
+}
+</script>
+</body>
+</html>

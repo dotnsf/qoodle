@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<title><%= room %> - Share</title>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/qrcode.min.js"></script>
+
+<link href="/colorbox.css" rel="stylesheet"/>
+<script src="/jquery.colorbox-min.js"></script>
+<script src="/common.js"></script>
+
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<link rel="shortcut icon" href="/icon.png" type="image/png"/>
+<link rel="icon" href="/icon.png" type="image/png"/>
+<link rel="apple-touch-icon" href="/icon.png"/>
+
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="Qoodle"/>
+
+<style type="text/css">
+html, body{
+  text-align: center;
+  background-color: #fafafa;
+  font-size: 20px;
+  color: #333;
+}
+.mycanvas{
+  border: 1px solid #333;
+}
+.card-columns{
+  column-count: 1;
+}
+.card-group .card{
+  max-width: calc(100%);
+}
+#open16_table{
+  background-repeat: no-repeat;
+  background-size: 100% 100%
+}
+.num_panel{
+  width: 15%;
+  height: 100px;
+  color: #fff;
+  background-color: #006;
+  border-style: solid;
+  border-width: 2px;
+  text-align: center;
+  opacity: 1;
+}
+#point{
+  color: #f00;
+  font-size: 40px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="qrcode"></canvas>
+
+<div id="main" class="container">
+</div>
+
+<div id="point" class="container">
+</div>
+
+<div class="modal bd-example-modal-lg fade" id="answersModal" tabindex="-1" role="dialog" aria-labbelledby="answersModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="answersModalLabel"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="answersmodal-body">
+        <div id="card-groups">
+          <!--
+          <div class="card-group" id="cards-1">
+          </div>
+          -->
+        </div>
+      </div>
+      <div class="modal-footer btn-center">
+        <!--
+        <button type="button" class="btn btn-info btn-xs py-0" onClick="migrateFrom();"><i class="fas fa-file-export"></i></button>
+        -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display:none;">
+  <div id="box_content">
+  </div>
+</div>
+
+<script>
+var uuid = generateUUID();
+var socketio = null;
+var socket_ids = [];
+
+var base_url = location.origin + '/';
+
+var cards = [];    //. カード
+var imgs = {};     //. 画像データ
+
+var quiz_point = 0;
+var image_category = -1;
+var image_blur = -1;
+var image_16_open = 0;
+
+$(function(){
+  socketio = io.connect();
+
+  init();
+
+  QRCode.toCanvas( document.getElementById( 'qrcode' ), base_url + '?room=<%= room %>', function( err ){
+    if( err ){ console.log( err ); }
+  });
+
+  var msg = {
+    uuid: uuid,
+    room: '<%= room %>',
+    timestamp: ( new Date() ).getTime()
+  };
+  socketio.json.emit( 'init_share', msg );
+
+  socketio.on( 'init_admin_view', function( msg ){
+    console.log( 'init_admin_view', msg );
+  });
+  socketio.on( 'init_share_view', function( msg ){
+    console.log( 'init_share_view', msg );
+  });
+
+  socketio.on( 'init_client_view', function( msg ){
+    var socket_id = msg.uuid; //msg.socket_id;
+    if( socket_ids.indexOf( socket_id ) > -1 ){
+    }else{
+      socket_ids.push( socket_id );
+      //$('#debug_ul').append( '<li id="socket_' + socket_id + '">' + socket_id + '</li>' );
+      console.log( socket_ids );
+
+      var color = generateColor( msg.name );
+
+      $('#card-groups').html( '' );
+      $.colorbox.remove();
+
+      //. カード追加
+      var card = '<div id="card_' + socket_id + '" class="card border-' + color + '" style="cursor: pointer;">'
+        + '<div class="card-body text-' + color + '">'
+        //+ '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="btn btn-xs btn-' + color + '" onClick="removeCard(\'card_' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
+        + '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="my_a btn btn-xs btn-' + color + '">&times;</a>' + msg.name + '</h4>'
+        + '</div>'
+        + '<a href="#box_content" id="box_content_' + socket_id + '" title="' + msg.name + '">'
+        + '<img class="card-img-bottom" id="image_' + socket_id + '" alt="(image of ' + msg.name + ')" ts="' + msg.timestamp + '"/>'
+        + '</a>'
+        + '</div>';
+      cards.push( card );
+
+      //. カードグループを必要数だけ追加
+      appendCardGroups( '#card-groups', cards.length );
+    }
+  });
+
+  socketio.on( 'image_client_view', function( msg ){
+    var socket_id = msg.uuid; //msg.socket_id;
+    if( socket_ids.indexOf( socket_id ) > -1 ){
+      var ts = $('#image_'+socket_id).attr( 'ts' );
+      ts = parseInt( ts );
+
+      if( msg.timestamp > ts ){
+        $('#image_'+socket_id).prop( 'src', msg.image_src );
+        $('#image_'+socket_id).prop( 'title', msg.comment );
+        $('#image_'+socket_id).prop( 'ts', msg.timestamp );
+
+        //. 再描画用に記録
+        var img = {
+          src: msg.image_src,
+          title: msg.comment,
+          ts: msg.timestamp
+        };
+        imgs[socket_id] = img;
+
+        var zoom_socket_id = $('#zoom_image').attr( 'socket_id' );
+        if( zoom_socket_id && zoom_socket_id == socket_id ){
+          $('#zoom_image').prop( 'src', msg.image_src );
+        }
+      }
+    }
+  });
+
+  socketio.on( 'quiz_select_view', function( msg ){
+    $('#main').html( '' );
+    $.ajax({
+      type: 'GET',
+      url: '/dbapi/quiz/' + msg.quiz_id,
+      success: function( result ){
+        if( result && result.status && result.body ){
+          //var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\');">' + qresult.body.body + '</a>';
+          quiz_point = result.body.point;
+          image_category = result.body.category;
+          var html = '<h2>' + result.body.body + '</h2>';
+          if( result.body.img_url ){
+            if( image_category != 2 ){
+              html += '<div><img id="q_image" src="' + result.body.img_url + '" width="100%"/></div>';
+            }else{
+              html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
+            }
+          }
+          $('#main').html( html );
+
+          //. image_category == 2 or 3 の場合は画像表示時に装飾が必要
+          //. $('#main').html( html ) の前に実行したほうがいい？
+          if( image_category == 2 ){
+            image_16_open = 0;
+            for( var i = 0; i < 4; i ++ ){
+              var tr = '<tr id="board_row_' + i + '">';
+              for( var j = 0; j < 4; j ++ ){
+                var num = ( i * 4 + j + 1 );
+                var td = '<td id="panel_' + num + '" class="num_panel">' + num + '</td>';
+                tr += td;
+              }
+              tr += '</tr>';
+              $('#open16_table').append( tr );
+            }
+          }else if( image_category == 3 ){
+            image_blur = 10;
+            $('#point').html( image_blur );
+          }
+        }
+      },
+      error: function( e0, e1, e2 ){
+        console.log( e0, e1, e2 );
+      }
+    });
+  });
+
+  socketio.on( 'quiz_hint_view', function( msg ){
+    console.log( 'quiz_hint_view', msg );
+    if( image_category == 3 ){
+      image_blur = msg.blur;
+      var blur_ratio = msg.ratio;
+      var t = $('#q_image')[0];
+      t.style['-ms-filter'] = 'blur(' + ( image_blur * blur_ratio ) + 'px)';
+      t.style['filter'] = 'blur(' + ( image_blur * blur_ratio ) + 'px)';
+      $('#point').html( ( image_blur + 1 ) );
+    }else if( image_category == 2 ){
+      var num = msg.num;
+      image_16_open = msg.open;
+
+      $('#panel_'+num).css( 'border-width', '1px' );
+      $('#panel_'+num).css( 'opacity', '0' );
+      $('#panel_'+num).html( '' );
+    }
+  });
+
+  socketio.on( 'quiz_finish_view', function( msg ){
+    console.log( 'quiz_finish_view', msg );
+  });
+
+  socketio.on( 'quiz_fixed_view', function( msg ){
+    console.log( 'quiz_fixed_view', msg );
+    var target_uuid = msg.uuid;
+    var target_quiz_id = msg.quiz_id;
+    var target_quizset_id = msg.quizset_id;
+    $('#card_'+target_uuid).removeClass( 'border-secondary' );
+    $('#card_'+target_uuid).removeClass( 'border-success' );
+    $('#a_'+target_uuid).removeClass( 'btn-secondary' );
+    $('#a_'+target_uuid).removeClass( 'btn-success' );
+    $('#card_'+target_uuid).addClass( 'border-warning' );
+    $('#a_'+target_uuid).addClass( 'btn-warning' );
+  });
+
+  socketio.on( 'quiz_correct_view', function( msg ){
+    console.log( 'quiz_correct_view', msg );
+
+    $('.card').removeClass( 'border-secondary' );
+    $('.card').removeClass( 'border-warning' );
+    $('.card').removeClass( 'border-success' );
+    $('.my_a').removeClass( 'btn-secondary' );
+    $('.my_a').removeClass( 'btn-warning' );
+    $('.my_a').removeClass( 'btn-success' );
+
+    if( msg.correct ){
+      $('#card_'+msg.socket_id).removeClass( 'border-warning');
+      $('#card_'+msg.socket_id).addClass( 'border-success');
+      $('#a_'+msg.socket_id).removeClass( 'btn-warning');
+      $('#a_'+msg.socket_id).addClass( 'btn-success');
+    }else{
+      $('#card_'+msg.socket_id).removeClass( 'border-success');
+      $('#card_'+msg.socket_id).addClass( 'border-warning');
+      $('#a_'+msg.socket_id).removeClass( 'btn-success');
+      $('#a_'+msg.socket_id).addClass( 'btn-warning');
+    }
+
+    selectCard( msg /*.socket_id */ );
+  });
+
+  socketio.on( 'show_answers_view', function( msg ){
+    console.log( 'show_answers_view', msg );
+    $('#answersModal').modal();
+  });
+
+  socketio.on( 'hide_answers_view', function( msg ){
+    console.log( 'hide_answers_view', msg );
+    $('body').removeClass( 'modal-open' );
+    $('.modal-backdrop').remove();
+    $('#answersModal').modal( 'hide' );
+  });
+});
+
+function init(){
+  //. リサイズ時
+  //$(window).on( 'load resize', function(){
+    resized();
+  //});
+}
+
+function resized(){
+  var browserWidth = window.innerWidth;
+  var browserHeight = window.innerHeight;
+
+  //socketio.emit( 'init_share', { room: '<%= room %>', width: browserWidth, height: browserHeight } );
+}
+
+function removeCard( card_id ){
+  $('#'+card_id).css( 'display', 'none' );
+
+  //. card_id = 'card_XXXXXX';
+  var socket_id = card_id.substr( 6 );
+  if( imgs[socket_id] ){
+    delete imgs[socket_id];
+  }
+
+  var b = true;
+  for( var i = 0; i < cards.length && b; i ++ ){
+    var card = cards[i];
+    if( card.indexOf( 'card_' + socket_id ) > -1 && card.indexOf( 'image_' + socket_id ) > -1 ){
+      cards.splice( i, 1 );
+      b = false;
+    }
+  }
+}
+
+function zoomImage( socket_id ){
+  if( socket_id ){
+    //console.log( 'zoomImage: socket_id = ' + socket_id );
+    $('#box_content').html( '<img id="zoom_image" socket_id="' + socket_id + '" src="' + $('#image_'+socket_id).prop( 'src' ) + '"/>' );
+  }
+}
+
+
+//. num 個の要素をなるべく正方形に近い表形式の card-group 化する
+function appendCardGroups( cardgroups_selector, num ){
+  //. 近づける正方形の一辺の長さ
+  var m = Math.ceil( Math.sqrt( num ) );
+  //. m 個の card-group が必要
+  for( var i = 0; i < m; i ++ ){
+    $(cardgroups_selector).append( '<div class="card-group" id="cards-' + i + '">' );
+  }
+  //. ( m * m ) の正方形の中に表示する
+  for( var i = 0; i < num; i ++ ){
+    var card = cards[i];
+    var row = Math.floor( i / m );
+    $('#cards-'+row).append( card );
+  }
+
+  //. クラスでまとめて ColorBox の指定
+  //$('.card').colorbox({ href: '#box_content', inline: true, transition: 'none', width: "90%", innerHeight: "90%", onOpen: function(){ var socket_id = $(this).prop( 'id' ).substr( 5 ); zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
+
+  if( num % m ){
+    var row = Math.floor( num / m );
+    for( var i = num; i % m > 0; i ++ ){
+      var dummycard = '<div class="card"></div>';
+      $('#cards-'+row).append( dummycard );
+    }
+  }
+
+  //. 画像再描画
+  Object.keys( imgs ).forEach( function( socket_id ){
+    var img = imgs[socket_id];
+    //console.log( 'appendCardGroups: socket_id = ' + socket_id, img );
+
+    $('#image_'+socket_id).prop( 'src', img.src );
+    $('#image_'+socket_id).prop( 'title', img.title );
+    $('#image_'+socket_id).prop( 'ts', img.ts );
+  });
+}
+</script>
+</body>
+</html>
