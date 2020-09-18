@@ -4,19 +4,19 @@ function selectCard( msg/*socket_id*/ ){
   console.log( 'selectCard: ', msg );
   //$('#card_'+socket_id).css( 'display', 'none' );
   if( msg.correct ){
-    $('#card_'+socket_id).removeClass( 'border-secondary' );
-    $('#card_'+socket_id).removeClass( 'border-warning' );
-    $('#a_'+socket_id).removeClass( 'btn-secondary' );
-    $('#a_'+socket_id).removeClass( 'btn-warning' );
-    $('#card_'+socket_id).addClass( 'border-success' );
-    $('#a_'+socket_id).addClass( 'btn-success' );
+    $('#card_'+msg.socket_id).removeClass( 'border-secondary' );
+    $('#card_'+msg.socket_id).removeClass( 'border-warning' );
+    $('#a_'+msg.socket_id).removeClass( 'btn-secondary' );
+    $('#a_'+msg.socket_id).removeClass( 'btn-warning' );
+    $('#card_'+msg.socket_id).addClass( 'border-success' );
+    $('#a_'+msg.socket_id).addClass( 'btn-success' );
   }else{
-    $('#card_'+socket_id).removeClass( 'border-secondary' );
-    $('#card_'+socket_id).removeClass( 'border-success' );
-    $('#a_'+socket_id).removeClass( 'btn-secondary' );
-    $('#a_'+socket_id).removeClass( 'btn-success' );
-    $('#card_'+socket_id).addClass( 'border-warning' );
-    $('#a_'+socket_id).addClass( 'btn-warning' );
+    $('#card_'+msg.socket_id).removeClass( 'border-secondary' );
+    $('#card_'+msg.socket_id).removeClass( 'border-success' );
+    $('#a_'+msg.socket_id).removeClass( 'btn-secondary' );
+    $('#a_'+msg.socket_id).removeClass( 'btn-success' );
+    $('#card_'+msg.socket_id).addClass( 'border-warning' );
+    $('#a_'+msg.socket_id).addClass( 'btn-warning' );
   }
 }
 

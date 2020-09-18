@@ -129,10 +129,13 @@ var imgs = {};     //. 画像データ
 
 var quiz_point = 0;
 var image_category = -1;
+var image_point = 0;
 var image_blur = -1;
 var blur_ratio = 1;
 var image_16_open = 0;
 var _quiz_id = null;
+
+var answers = {};
 
 $(function(){
   socketio = io.connect();
@@ -164,7 +167,7 @@ $(function(){
                 //console.log( 'quiz_id = ' + quiz_id + ', _id = ' + qresult.body._id );
                 var cat = ['一般','フリーテキスト','16分割','ぼかし'][qresult.body.category];
                 $('#quizcat_'+qresult.body._id).html( cat );
-                var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\');">' + qresult.body.body + '</a>';
+                var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ');">' + qresult.body.body + '</a>';
                 $('#quizbody_'+qresult.body._id).html( a );
                 $('#quizcomment_'+qresult.body._id).html( qresult.body.comment );
                 $('#quizpoint_'+qresult.body._id).html( qresult.body.point );
@@ -300,7 +303,7 @@ $(function(){
             case 3:
               //. ぼかしクイズ
               html += '<br/>'
-                + '<input id="rng" type="range" value="10" min="0" max="9" step="1" onInput="changeBlur();"/> <span id="range_value">10</span>';
+                + '<input id="rng" type="range" value="9" min="0" max="9" step="1" onInput="changeBlur();"/> <span id="range_value">10</span>';
               break;
             }
 
@@ -313,9 +316,9 @@ $(function(){
                 if( e.complete ){
                   blur_ratio = Math.floor( e.naturalWidth / 100 );
                   clearInterval( iid );
+                  changeBlur();
                 }
-              }, 500 );
-              changeBlur();
+              }, 10 );
             }else if( result.body.category == 2 ){
               image_16_open = 0;
               for( var i = 0; i < 4; i ++ ){
@@ -358,10 +361,24 @@ $(function(){
     $('#a_'+target_uuid).removeClass( 'btn-success' );
     $('#card_'+target_uuid).addClass( 'border-warning' );
     $('#a_'+target_uuid).addClass( 'btn-warning' );
+
+    if( answers[target_quiz_id] ){
+      var answer = { point: image_point, correct: false };
+      if( image_category == 2 ){
+        answer.point = 17;
+      }else if( image_category == 3 ){
+        answer.point = parseInt( $('#rng').val() ) + 1;
+      }
+      answers[target_quiz_id][target_uuid] = answer;
+    }
   });
 
   socketio.on( 'quiz_correct_view', function( msg ){
     console.log( 'quiz_correct_view', msg );
+    if( answers[_quiz_id] && answers[_quiz_id][msg.socket_id] ){
+      answers[_quiz_id][msg.socket_id].correct = msg.correct;
+    }
+    console.log( 'quiz_correct_view', answers );
     selectCard( msg );
   });
 });
@@ -464,9 +481,12 @@ function appendCardGroups( cardgroups_selector, num ){
   });
 }
 
-function selectQuiz( quiz_id ){
+function selectQuiz( quiz_id, quiz_category, quiz_point ){
   console.log( 'selectQuiz: quiz_id = ' + quiz_id );
-  socketio.emit( 'quiz_select', { room: '<%= room %>', quiz_id: quiz_id, quizset_id: '<%= id %>' } );
+  image_category = quiz_category;
+  image_point = quiz_point;
+  if( !answers[quiz_id] ){ answers[quiz_id] = {}; }
+  socketio.emit( 'quiz_select', { room: '<%= room %>', quiz_id: quiz_id, quizset_id: '<%= id %>', quiz_category: quiz_category, quiz_point: quiz_point } );
 }
 
 function showAnswers(){

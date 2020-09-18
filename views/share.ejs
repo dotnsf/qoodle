@@ -230,9 +230,12 @@ $(function(){
               tr += '</tr>';
               $('#open16_table').append( tr );
             }
+            $('#point').html( '17' );
           }else if( image_category == 3 ){
             image_blur = 10;
             $('#point').html( image_blur );
+          }else if( image_category == 0 ){
+            $('#point').html( msg.quiz_point );
           }
         }
       },
@@ -258,6 +261,8 @@ $(function(){
       $('#panel_'+num).css( 'border-width', '1px' );
       $('#panel_'+num).css( 'opacity', '0' );
       $('#panel_'+num).html( '' );
+
+      $('#point').html( ( 17 - image_16_open ) );
     }
   });
 
