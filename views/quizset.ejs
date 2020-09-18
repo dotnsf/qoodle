@@ -63,7 +63,7 @@ html, body{
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>#</th><th>category</th></th><th>image</th><th>body</th>
+        <th>#</th><th>category</th></th><th>image</th><th>body</th><th>comment</th><th>point</th>
       </tr>
     </thead>
     <tbody id="quizlist_tbody">
@@ -151,6 +151,8 @@ $(function(){
             + '<td id="quizcat_' + quiz_id + '">&nbsp;</td>'
             + '<td id="quizimg_' + quiz_id + '">&nbsp;</td>'
             + '<td id="quizbody_' + quiz_id + '"></td>'
+            + '<td id="quizcomment_' + quiz_id + '"></td>'
+            + '<td id="quizpoint_' + quiz_id + '"></td>'
             + '</tr>';
           $('#quizlist_tbody').append( tr );
 
@@ -164,6 +166,8 @@ $(function(){
                 $('#quizcat_'+qresult.body._id).html( cat );
                 var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\');">' + qresult.body.body + '</a>';
                 $('#quizbody_'+qresult.body._id).html( a );
+                $('#quizcomment_'+qresult.body._id).html( qresult.body.comment );
+                $('#quizpoint_'+qresult.body._id).html( qresult.body.point );
                 if( qresult.body.img_url ){
                   var img = '<img src="' + qresult.body.img_url + '" width="100"/>';
                   $('#quizimg_'+qresult.body._id).html( img );
@@ -377,20 +381,22 @@ function resized(){
 }
 
 function selectSocket( socket_id ){
-  //. もう一度選択したらキャンセルできるようにしたい
-  var s = $('#card_'+socket_id).hasClass( 'border-success');
-  if( s ){
-    $('#card_'+socket_id).removeClass( 'border-success');
-    $('#card_'+socket_id).addClass( 'border-warning');
-    $('#a_'+socket_id).removeClass( 'btn-success');
-    $('#a_'+socket_id).addClass( 'btn-warning');
-    socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: false } );
-  }else{
-    $('#card_'+socket_id).removeClass( 'border-warning');
-    $('#card_'+socket_id).addClass( 'border-success');
-    $('#a_'+socket_id).removeClass( 'btn-warning');
-    $('#a_'+socket_id).addClass( 'btn-success');
-    socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: true } );
+  //. 送信前は採点できなくする
+  if( $('#card_'+socket_id).hasClass( 'border-success') || $('#card_'+socket_id).hasClass( 'border-warning') ){
+    //. もう一度選択したらキャンセルできるようにしたい
+    if( $('#card_'+socket_id).hasClass( 'border-success') ){
+      $('#card_'+socket_id).removeClass( 'border-success');
+      $('#card_'+socket_id).addClass( 'border-warning');
+      $('#a_'+socket_id).removeClass( 'btn-success');
+      $('#a_'+socket_id).addClass( 'btn-warning');
+      socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: false } );
+    }else{
+      $('#card_'+socket_id).removeClass( 'border-warning');
+      $('#card_'+socket_id).addClass( 'border-success');
+      $('#a_'+socket_id).removeClass( 'btn-warning');
+      $('#a_'+socket_id).addClass( 'btn-success');
+      socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: true } );
+    }
   }
 }
 

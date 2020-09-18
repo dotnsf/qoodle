@@ -104,7 +104,7 @@ html, body{
 
   <br/>
   <input type="button" class="btn btn-xs" id="undo_btn" value="<" onClick="undo();" disabled="disabled"/>
-  <input type="button" class="btn btn-xs btn-warning" value="<%= __('common.button.reset') %>" onClick="resetCanvas();"/>
+  <input type="button" class="btn btn-xs btn-warning" id="reset_btn" value="<%= __('common.button.reset') %>" onClick="resetCanvas();"/>
   <input type="button" class="btn btn-xs btn-primary" id="save_btn" value="<%= __('common.button.send') %>" onClick="save();"/>
   <input type="button" class="btn btn-xs" id="redo_btn" value=">" onClick="redo();" disabled="disabled"/>
 </div>
@@ -162,6 +162,13 @@ $(function(){
   socketio.on( 'quiz_select_view', function( msg ){
     started = true;
     locked = false;
+
+    $('#setbg_btn').prop( 'disabled', false );
+    //$('#undo_btn').prop( 'disabled', false );
+    //$('#redo_btn').prop( 'disabled', false );
+    $('#reset_btn').prop( 'disabled', false );
+    $('#save_btn').prop( 'disabled', false );
+
     quiz_id = msg.quiz_id;
     quizset_id = msg.quizset_id;
     console.log( 'quiz_select_view', msg );
@@ -511,6 +518,8 @@ function isAndroid(){
 }
 
 function save(){
+  if( quiz_id ){  //. 問題選択前は無効
+
   var canvas = document.getElementById( 'mycanvas' );
   if( !canvas || !canvas.getContext ){
     return false;
@@ -562,12 +571,21 @@ function save(){
         };
         socketio.json.emit( 'quiz_fixed', msg );
         $('#main').addClass('fixed');
+
+        //. 他の操作を不能にする
+        $('#setbg_btn').prop( 'disabled', true );
+        $('#undo_btn').prop( 'disabled', true );
+        $('#redo_btn').prop( 'disabled', true );
+        $('#reset_btn').prop( 'disabled', true );
+        $('#save_btn').prop( 'disabled', true );
       }
     },
     error: function( jqXHR, textStatus, errorThrown ){
       console.log( textStatus + ': ' + errorThrown );
     }
   });
+
+  }
 }
 
 function undo(){
