@@ -209,7 +209,7 @@ $(function(){
           var html = '<h2>' + result.body.body + '</h2>';
           if( result.body.img_url ){
             if( image_category != 2 ){
-              html += '<div><img id="q_image" src="' + result.body.img_url + '" width="100%"/></div>';
+              html += '<div><img id="q_image" src="' + result.body.img_url + '" width="100%" style="display: none;"/></div>';
             }else{
               html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
             }
@@ -235,6 +235,7 @@ $(function(){
             image_blur = 10;
             $('#point').html( image_blur );
           }else if( image_category == 0 ){
+            $('#q_image').css( 'display', 'block' );
             $('#point').html( msg.quiz_point );
           }
         }
@@ -253,6 +254,7 @@ $(function(){
       var t = $('#q_image')[0];
       t.style['-ms-filter'] = 'blur(' + ( image_blur * blur_ratio ) + 'px)';
       t.style['filter'] = 'blur(' + ( image_blur * blur_ratio ) + 'px)';
+      $('#q_image').css( 'display', 'block' );
       $('#point').html( ( image_blur + 1 ) );
     }else if( image_category == 2 ){
       var num = msg.num;
@@ -318,6 +320,10 @@ $(function(){
     $('body').removeClass( 'modal-open' );
     $('.modal-backdrop').remove();
     $('#answersModal').modal( 'hide' );
+  });
+
+  socketio.on( 'show_rank_view', function( msg ){
+    console.log( 'show_rank_view', msg );
   });
 });
 

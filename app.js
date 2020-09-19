@@ -191,6 +191,13 @@ io.on( 'connection', function( socket ){
     var room = msg.room ? msg.room : settings.defaultroom;
     io.to(room).emit( 'hide_answers_view', msg );
   });
+
+  socket.on( 'show_rank', function( msg ){
+    //console.log( 'quiz_fixed', msg );
+    msg.socket_id = socket.id;
+    var room = msg.room ? msg.room : settings.defaultroom;
+    io.to(room).emit( 'show_rank_view', msg );
+  });
 });
 
 
