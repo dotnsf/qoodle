@@ -75,6 +75,7 @@ html, body{
   <ul class="nav nav-tabs">
     <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active">出題画面</a></li>
     <li class="nav-item"><a href="#tab-pane-answers" data-toggle="tab" class="nav-link">解答画面</a></li>
+    <li class="nav-item"><a href="#tab-pane-rank" data-toggle="tab" class="nav-link">ランキング画面</a></li>
   </ul>
   <div class="tab-content">
     <div id="tab-pane-quiz" class="tab-pane active">
@@ -87,8 +88,16 @@ html, body{
         -->
       </div>
 
-      <button id="showAnswersBtn" class="btn btn-primary" onClick="showAnswers();">Show</button>
+      <button id="quizFinishBtn" class="btn btn-primary" onClick="quizFinish();">Quiz Finish</button>
+      <button id="showAnswersBtn" class="btn btn-primary" onClick="showAnswers();" style="display: none">Show</button>
       <button id="hideAnswersBtn" class="btn btn-primary" onClick="hideAnswers();" style="display: none">Hide</button>
+    </div>
+    <div id="tab-pane-rank" class="tab-pane">
+      <div id="rank-table">
+      </div>
+
+      <button id="showRankBtn" class="btn btn-primary" onClick="showRank();">Show</button>
+      <button id="hideRankBtn" class="btn btn-primary" onClick="hideRank();" style="display: none">Hide</button>
     </div>
   </div>
 </div>
@@ -136,6 +145,7 @@ var image_16_open = 0;
 var _quiz_id = null;
 
 var answers = {};
+var names = {};
 
 $(function(){
   socketio = io.connect();
@@ -231,6 +241,9 @@ $(function(){
       //. カードグループを必要数だけ追加
       appendCardGroups( '#card-groups', cards.length );
     }
+
+    //. 表示名を更新
+    names[socket_id] = msg.name;
   });
 
   socketio.on( 'image_client_view', function( msg ){
@@ -483,22 +496,57 @@ function appendCardGroups( cardgroups_selector, num ){
 
 function selectQuiz( quiz_id, quiz_category, quiz_point ){
   console.log( 'selectQuiz: quiz_id = ' + quiz_id );
+  $('#showAnswersBtn').css( 'display', 'none' );
+  $('#hideAnswersBtn').css( 'display', 'none' );
+  $('#quizFinishBtn').css( 'display', 'block' );
   image_category = quiz_category;
   image_point = quiz_point;
   if( !answers[quiz_id] ){ answers[quiz_id] = {}; }
   socketio.emit( 'quiz_select', { room: '<%= room %>', quiz_id: quiz_id, quizset_id: '<%= id %>', quiz_category: quiz_category, quiz_point: quiz_point } );
+
+  return false;
+}
+
+function quizFinish(){
+  $('#quizFinishBtn').css( 'display', 'none' );
+  //setTimeout( function(){
+    $('#showAnswersBtn').css( 'display', 'block' );
+    socketio.emit( 'quiz_finish', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+  //}, 5000 );
 }
 
 function showAnswers(){
   $('#showAnswersBtn').css( 'display', 'none' );
   $('#hideAnswersBtn').css( 'display', 'block' );
   socketio.emit( 'show_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+
+  return false;
 }
 
 function hideAnswers(){
   $('#showAnswersBtn').css( 'display', 'block' );
   $('#hideAnswersBtn').css( 'display', 'none' );
   socketio.emit( 'hide_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+
+  return false;
+}
+
+function showRank(){
+  $('#showRankBtn').css( 'display', 'none' );
+  $('#hideRankBtn').css( 'display', 'block' );
+
+  //. 現在のランキング情報をメッセージに含める
+  socketio.emit( 'show_rank', { room: '<%= room %>', quizset_id: '<%= id %>', answers: answers, names: names } );
+
+  return false;
+}
+
+function hideRank(){
+  $('#showRankBtn').css( 'display', 'block' );
+  $('#hideRankBtn').css( 'display', 'none' );
+  socketio.emit( 'hide_rank', { room: '<%= room %>', quizset_id: '<%= id %>' } );
+
+  return false;
 }
 
 function changeBlur(){

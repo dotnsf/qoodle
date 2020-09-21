@@ -200,6 +200,11 @@ $(function(){
       }
     }
   });
+
+  socketio.on( 'lock_answer_view', function( msg ){
+    console.log( 'lock_answer_view', msg );
+    save();
+  });
 });
 
 function init(){

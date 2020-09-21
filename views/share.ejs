@@ -101,6 +101,25 @@ html, body{
   </div>
 </div>
 
+<div class="modal bd-example-modal-lg fade" id="rankModal" tabindex="-1" role="dialog" aria-labbelledby="rankModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="rankModalLabel"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="rankmodal-body">
+        <table id="ranktable" class="table table-bordered">
+        </table>
+      </div>
+      <div class="modal-footer btn-center">
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 var uuid = generateUUID();
 var socketio = null;
@@ -158,9 +177,9 @@ $(function(){
         //+ '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="btn btn-xs btn-' + color + '" onClick="removeCard(\'card_' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
         + '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="my_a btn btn-xs btn-' + color + '">&times;</a>' + msg.name + '</h4>'
         + '</div>'
-        + '<a href="#box_content" id="box_content_' + socket_id + '" title="' + msg.name + '">'
+        //+ '<a href="#box_content" id="box_content_' + socket_id + '" title="' + msg.name + '">'
         + '<img class="card-img-bottom" id="image_' + socket_id + '" alt="(image of ' + msg.name + ')" ts="' + msg.timestamp + '"/>'
-        + '</a>'
+        //+ '</a>'
         + '</div>';
       cards.push( card );
 
@@ -270,6 +289,10 @@ $(function(){
 
   socketio.on( 'quiz_finish_view', function( msg ){
     console.log( 'quiz_finish_view', msg );
+    //. ５秒カウント後に強制ロック
+    //setTimeout( function(){
+      socketio.emit( 'lock_answer', { room: '<%= room %>', quiz_id: msg.quiz_id, quizset_id: msg.quizset_id } );
+    //}, 5000 );
   });
 
   socketio.on( 'quiz_fixed_view', function( msg ){
@@ -324,6 +347,110 @@ $(function(){
 
   socketio.on( 'show_rank_view', function( msg ){
     console.log( 'show_rank_view', msg );
+    $('#ranktable').html( '' );
+
+    //. msg.answers を集計＆反映
+    if( msg.answers ){
+      //. msg.answers = {
+      //.  quiz_id1: {
+      //.    uuid1: { point: 1, correct: true },
+      //.    uuid2: { point: 2, correct: true },
+      //.    uuid3: { point: 1, correct: false }
+      //.  },
+      //.  quiz_id2: {
+      //.    uuid1: { point: 5, correct: true },
+      //.    uuid2: { point: 5, correct: false },
+      //.    uuid3: { point: 2, correct: true }
+      //.  }, ..
+      //. }
+
+      //. 全参加者 ID と全問題 ID を確認
+      var uuids = [];
+      var quizs = [];
+      Object.keys( msg.answers ).forEach( function( quiz_id_ ){
+        quizs.push( quiz_id_ );
+        var answersObj = msg.answers[quiz_id_];
+        Object.keys( answersObj ).forEach( function( uuid_ ){
+          //var answer = answersObj[uuid_];
+          if( uuids.indexOf(uuid_) == -1 ){
+            uuids.push( uuid_ );
+          }
+        });
+      });
+
+      //. 参加者ごとに各問題への正誤を確認し、総得点をカウントする
+      var points = {};
+      var point_by_uuid = {};
+      uuids.forEach( function( uuid_ ){
+        points[uuid_] = 0;
+        point_by_uuid[uuid_] = {};
+      });
+      Object.keys( msg.answers ).forEach( function( quiz_id_ ){
+        var answersObj = msg.answers[quiz_id_];
+        Object.keys( answersObj ).forEach( function( uuid_ ){
+          var answer = answersObj[uuid_];  //. { point: 5, correct: true }
+          if( answer ){
+            if( answer.correct ){
+              point_by_uuid[uuid_][quiz_id_] = answer.point;
+              points[uuid_] += answer.point;
+            }else{
+              point_by_uuid[uuid_][quiz_id_] = 0;
+            }
+          }else{
+            point_by_uuid[uuid_][quiz_id_] = '';
+          }
+        });
+      });
+
+      //. 参加者ごとのランキングを集計
+      var rank_by_uuid = {};
+      uuids.forEach( function( uuid_ ){
+        rank_by_uuid[uuid_] = 1;
+      });
+      for( var i = 0; i < uuids.length; i ++ ){
+        for( var j = 0; j < uuids.length; j ++ ){
+          if( i != j && points[uuids[i]] < points[uuids[j]] ){
+            rank_by_uuid[uuids[i]] ++;
+          }
+        }
+      }
+
+      //. thead 作成
+      var thead = '<thead><tr>';
+      thead += '<th>Name</th>';
+      for( var i = 0; i < quizs.length; i ++ ){
+        var quiz_id_ = quizs[i];
+        //thead += '<th>' + quiz_id_ + '</th>';
+        thead += '<th>' + ( i + 1 ) + '</th>';
+      }
+      thead += '<th>Sum</th>';
+      thead += '<th>Ranking</th>';
+      thead += '</tr></thead><tbody id="ranktable-body"></tbody>';
+      $('#ranktable').html( thead );
+
+      //. 参加者ごとに各問題ごとの得点を表形式で表記
+      uuids.forEach( function( uuid_ ){
+        var tr = '<tr>';
+        tr += '<td>' + ( msg.names[uuid_] ? msg.names[uuid_] : uuid_ ) + '</td>';   //. 名前にしたい
+        quizs.forEach( function( quiz_id_ ){
+          tr += '<td>' + point_by_uuid[uuid_][quiz_id_] + '</td>';
+        });
+        tr += '<td>' + points[uuid_] + '</td>';
+        tr += '<td>' + rank_by_uuid[uuid_] + '</td></tr>';
+        $('#ranktable-body').append( tr );
+      });
+    }else{
+      $('#rankmodal-body').html( 'ランキング情報なし' );
+    }
+
+    $('#rankModal').modal();
+  });
+
+  socketio.on( 'hide_rank_view', function( msg ){
+    console.log( 'hide_rank_view', msg );
+    $('body').removeClass( 'modal-open' );
+    $('.modal-backdrop').remove();
+    $('#rankModal').modal( 'hide' );
   });
 });
 
