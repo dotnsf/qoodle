@@ -59,6 +59,10 @@ var dbapi = require( './dbapi/dbapi' );
 app.use( '/dbapi', dbapi );
 
 
+app.get( '/admin', function( req, res ){
+  res.render( 'admin', {} );
+});
+
 app.get( '/draw', function( req, res ){
   var name = req.query.name;
   if( !name ){ name = '' + ( new Date() ).getTime(); }
@@ -237,3 +241,8 @@ function timestamp2datetime( ts ){
 var port = process.env.PORT || 8080;
 http.listen( port );
 console.log( "server starting on " + port + " ..." );
+
+if( settings.db_username && settings.db_password ){
+  var dashboard_url = 'https://' + settings.db_username + ':' + settings.db_password + '@' + settings.db_username + '.cloudant.com/dashboard.html';
+  console.log( "DB Dashboard: " + dashboard_url );
+}

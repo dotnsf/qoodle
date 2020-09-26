@@ -102,6 +102,7 @@ router.post( '/quiz', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_quiz ){
+    var id = generateId();
     var ts = ( new Date() ).getTime();
     var category = req.body.category ? req.body.category : 0;
     var point = req.body.point ? req.body.point : 1;
@@ -111,6 +112,7 @@ router.post( '/quiz', function( req, res ){
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
     var params = {
+      _id: id,
       type: 'quiz',
       category: category,
       point: point,
@@ -323,12 +325,16 @@ router.post( '/quizset', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_quizset ){
+    var id = generateId();
     var ts = ( new Date() ).getTime();
     var quiz_ids = req.body.quiz_ids ? req.body.quiz_ids : [];
+    var subject = req.body.subject ? req.body.subject : '';
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
     var params = {
+      _id: id,
       type: 'quizset',
+      subject: subject,
       quiz_ids: quiz_ids,
       user_id: user_id,
       user_name: user_name,
@@ -435,10 +441,14 @@ router.put( '/quizset/:id', function( req, res ){
         res.end();
       }else{
         var ts = ( new Date() ).getTime();
+        var subject = req.body.subject ? req.body.subject : '';
         var quiz_ids = req.body.quiz_ids ? req.body.quiz_ids : [];
         if( body1.user_id == req.body.user_id ){
           if( quiz_ids ){
             body1.quiz_ids = quiz_ids;
+          }
+          if( subject ){
+            body1.subject = subject;
           }
           body1.updated = ts;
           db_quizset.insert( body1, function( err, body, header ){
@@ -517,6 +527,7 @@ router.post( '/answer', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_answer ){
+    var id = generateId();
     var ts = ( new Date() ).getTime();
     var quiz_id = req.body.quiz_id ? req.body.quiz_id : '';
     var quizset_id = req.body.quizset_id ? req.body.quizset_id : '';
@@ -524,6 +535,7 @@ router.post( '/answer', function( req, res ){
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
     var params = {
+      _id: id,
       type: 'answer',
       quiz_id: quiz_id,
       quizset_id: quizset_id,
@@ -741,12 +753,14 @@ router.post( '/image', function( req, res ){
     var img = fs.readFileSync( imgpath );
     var img64 = new Buffer( img ).toString( 'base64' );
 
+    var id = generateId();
     var ts = ( new Date() ).getTime();
     var quiz_id = req.body.quiz_id ? req.body.quiz_id : '';
     var quizset_id = req.body.quizset_id ? req.body.quizset_id : '';
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
     var params = {
+      _id: id,
       type: 'image',
       quiz_id: quiz_id,
       quizset_id: quizset_id,
@@ -986,8 +1000,6 @@ router.delete( '/image/:id', function( req, res ){
 });
 
 
-
-
 function timestamp2datetime( ts ){
   if( ts ){
     var dt = new Date( ts );
@@ -1003,6 +1015,13 @@ function timestamp2datetime( ts ){
   }else{
     return "";
   }
+}
+
+function generateId(){
+  var s = 1000;
+  var id = ( new Date().getTime().toString(16) ) + Math.floor( s * Math.random() ).toString(16);
+
+  return id;
 }
 
 

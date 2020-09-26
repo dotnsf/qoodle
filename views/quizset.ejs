@@ -57,7 +57,7 @@ html, body{
 </head>
 <body>
 
-<h1><%= id %></h1>
+<h1 id="subject"><%= id %></h1>
 
 <div class="container">
   <table class="table table-bordered">
@@ -157,6 +157,7 @@ $(function(){
     url: '/dbapi/quizset/<%= id %>',
     success: function( result ){
       if( result && result.status && result.body && result.body.quiz_ids ){
+        $('#subject').html( result.body.subject );
         for( var i = 0; i < result.body.quiz_ids.length; i ++ ){
           var quiz_id = result.body.quiz_ids[i];
           var tr = '<tr id="quiz_' + quiz_id + '">'
