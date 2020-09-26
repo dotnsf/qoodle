@@ -104,8 +104,8 @@ router.post( '/quiz', function( req, res ){
   if( db_quiz ){
     var id = generateId();
     var ts = ( new Date() ).getTime();
-    var category = req.body.category ? req.body.category : 0;
-    var point = req.body.point ? req.body.point : 1;
+    var category = req.body.category ? parseInt( req.body.category ) : 0;
+    var point = req.body.point ? parseInt( req.body.point ) : 1;
     var body = req.body.body ? req.body.body : '';
     var comment = req.body.comment ? req.body.comment : '';
     var img_url = req.body.img_url ? req.body.img_url : '';
@@ -233,10 +233,10 @@ router.put( '/quiz/:id', function( req, res ){
 
         if( body1.user_id == user_id ){
           if( category ){
-            body1.category = category;
+            body1.category = parseInt( category );
           }
           if( point ){
-            body1.point = point;
+            body1.point = parseInt( point );
           }
           if( body ){
             body1.body = body;

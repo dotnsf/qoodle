@@ -31,6 +31,12 @@ $(function(){
     order: [ [ 2, 'desc' ] ]
   });
   */
+  reloadQuizs();
+  reloadQuizsets();
+});
+
+function reloadQuizs(){
+  $('#quiz_table_body').html( '' );
   $.ajax({
     type: 'GET',
     url: '/dbapi/quizs?user_id=' + uuid,
@@ -76,7 +82,10 @@ $(function(){
       console.log( err );
     }
   });
+}
 
+function reloadQuizsets(){
+  $('#quizset_table_body').html( '' );
   $.ajax({
     type: 'GET',
     url: '/dbapi/quizsets?user_id=' + uuid,
@@ -97,7 +106,7 @@ $(function(){
       var tr = '<tr>'
         + '<td><input type="text" class="form-control" id="edit_quizset_id" value=""/></td>'
         + '<td><input type="text" class="form-control" id="edit_quizset_subject" value=""/></td>'
-        + '<td><input type="text" class="form-control" id="edit_quizset_ids" value=""/></td>'
+        + '<td><input type="text" class="form-control" id="edit_quizset_ids" value="" placeholder=\'["xxx","yyy"]\'/></td>'
         + '<td> - </td>'
         + '<td><button class="btn btn-xs btn-success" onClick="saveQuizset();">Save</button></td>'
         + '</tr>';
@@ -107,7 +116,7 @@ $(function(){
       console.log( err );
     }
   });
-});
+}
 
 function saveQuiz(){
   var quiz_id = $('#edit_quiz_id').val();
@@ -126,7 +135,8 @@ function saveQuiz(){
       url: '/dbapi/quiz/' + quiz_id,
       data: data,
       success: function( result ){
-        location.href = '/admin';
+        //location.href = '/admin';
+        reloadQuizs();
       },
       error: function( e0, e1, e2 ){
       }
@@ -137,7 +147,8 @@ function saveQuiz(){
       url: '/dbapi/quiz',
       data: data,
       success: function( result ){
-        location.href = '/admin';
+        //location.href = '/admin';
+        reloadQuizs();
       },
       error: function( e0, e1, e2 ){
       }
@@ -160,7 +171,8 @@ function saveQuizset(){
       url: '/dbapi/quizset/' + quizset_id,
       data: data,
       success: function( result ){
-        location.href = '/admin';
+        //location.href = '/admin';
+        reloadQuizsets();
       },
       error: function( e0, e1, e2 ){
       }
@@ -171,7 +183,8 @@ function saveQuizset(){
       url: '/dbapi/quizset',
       data: data,
       success: function( result ){
-        location.href = '/admin';
+        //location.href = '/admin';
+        reloadQuizsets();
       },
       error: function( e0, e1, e2 ){
       }
@@ -274,7 +287,8 @@ function delQuiz( id ){
       type: 'DELETE',
       url: '/dbapi/quiz/' + id,
       success: function( result ){
-        location.href = '/admin';
+        //location.href = '/admin';
+        reloadQuizs();
       },
       error: function( err ){
         console.log( err );
@@ -289,7 +303,8 @@ function delQuizset( id ){
       type: 'DELETE',
       url: '/dbapi/quizset/' + id,
       success: function( result ){
-        location.href = '/admin';
+        //location.href = '/admin';
+        reloadQuizsets();
       },
       error: function( err ){
         console.log( err );
@@ -328,7 +343,7 @@ html, body{
 </head>
 <body>
 
-<div class="container p-3" id="admin_body">
+<div class="container_ p-3" id="admin_body">
   <ul class="nav nav-tabs">
     <li class="nav-item"><a href="#tab-pane-quizset" data-toggle="tab" class="nav-link">クイズセット</a></li>
     <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active">クイズ</a></li>
