@@ -519,7 +519,7 @@ function quizFinish(){
 function showAnswers(){
   $('#showAnswersBtn').css( 'display', 'none' );
   $('#hideAnswersBtn').css( 'display', 'block' );
-  socketio.emit( 'show_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+  socketio.emit( 'show_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>', answers: answers[_quiz_id] } );
 
   return false;
 }

@@ -193,11 +193,22 @@ $(function(){
     var target_uuid = msg.socket_id;
     if( target_uuid == uuid ){
       console.log( 'quiz_correct_view', msg );
+      /* このタイミングでは画面変更しないで、show_answers_view で画面変更する
       if( msg.correct ){
         $('#main').addClass( 'correct' );
       }else{
         $('#main').removeClass( 'correct' );
       }
+      */
+    }
+  });
+
+  socketio.on( 'show_answers_view', function( msg ){
+    console.log( 'show_answers_view', msg );
+    if( msg.answers && msg.answers[uuid] && msg.answers[uuid].correct ){
+      $('#main').addClass( 'correct' );
+    }else{
+      $('#main').removeClass( 'correct' );
     }
   });
 
