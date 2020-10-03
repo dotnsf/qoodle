@@ -63,7 +63,7 @@ html, body{
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>#</th><th>category</th></th><th>image</th><th>body</th><th>comment</th><th>point</th>
+        <th>#</th><th><%= __('quizset.list.col1.label') %></th><th><%= __('quizset.list.col2.label') %></th><th><%= __('quizset.list.col3.label') %></th><th><%= __('quizset.list.col4.label') %></th><th><%= __('quizset.list.col5.label') %></th>
       </tr>
     </thead>
     <tbody id="quizlist_tbody">
@@ -73,9 +73,9 @@ html, body{
 
 <div class="container p-3" id="quiz_body">
   <ul class="nav nav-tabs">
-    <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active">出題画面</a></li>
-    <li class="nav-item"><a href="#tab-pane-answers" data-toggle="tab" class="nav-link">解答画面</a></li>
-    <li class="nav-item"><a href="#tab-pane-rank" data-toggle="tab" class="nav-link">ランキング画面</a></li>
+    <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active"><%= __('quizset.tab.quiz.label') %></a></li>
+    <li class="nav-item"><a href="#tab-pane-answers" data-toggle="tab" class="nav-link"><%= __('quizset.tab.answers.label') %></a></li>
+    <li class="nav-item"><a href="#tab-pane-rank" data-toggle="tab" class="nav-link"><%= __('quizset.tab.rank.label') %></a></li>
   </ul>
   <div class="tab-content">
     <div id="tab-pane-quiz" class="tab-pane active">
@@ -88,16 +88,14 @@ html, body{
         -->
       </div>
 
-      <button id="quizFinishBtn" class="btn btn-primary" onClick="quizFinish();">Quiz Finish</button>
-      <button id="showAnswersBtn" class="btn btn-primary" onClick="showAnswers();" style="display: none">Show</button>
-      <button id="hideAnswersBtn" class="btn btn-primary" onClick="hideAnswers();" style="display: none">Hide</button>
+      <button id="quizFinishBtn" class="btn btn-primary" onClick="quizFinish();"><%= __('quizset.quizfinish.button') %></button>
+      <button id="showAnswersBtn" class="btn btn-primary" onClick="showAnswers();" style="display: none"><%= __('quizset.showanswers.button') %></button>
     </div>
     <div id="tab-pane-rank" class="tab-pane">
       <div id="rank-table">
       </div>
 
-      <button id="showRankBtn" class="btn btn-primary" onClick="showRank();">Show</button>
-      <button id="hideRankBtn" class="btn btn-primary" onClick="hideRank();" style="display: none">Hide</button>
+      <button id="showRankBtn" class="btn btn-primary" onClick="showRank();"><%= __('quizset.showrank.button') %></button>
     </div>
   </div>
 </div>
@@ -106,7 +104,7 @@ html, body{
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="answersModalLabel"></h4>
+        <h4 class="modal-title" id="answersModalLabel"><%= __('quizset.answersmodallabel') %></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -116,6 +114,48 @@ html, body{
           <tbody id="answers_body">
           </tbody>
         </table>
+      </div>
+      <div class="modal-footer btn-center">
+        <!--
+        <button type="button" class="btn btn-info btn-xs py-0" onClick="migrateFrom();"><i class="fas fa-file-export"></i></button>
+        -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal bd-example-modal-lg fade" id="hideAnswersModal" tabindex="-1" role="dialog" aria-labbelledby="hideAnswersModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="hideAnswersModalLabel"><%= __('quizset.hideanswersmodal.label') %></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="hideanswersmodal-body">
+        <button id="hideAnswersBtn" class="btn btn-primary" onClick="hideAnswers();"><%= __('quizset.hideanswersmodal.button' )%></button>
+      </div>
+      <div class="modal-footer btn-center">
+        <!--
+        <button type="button" class="btn btn-info btn-xs py-0" onClick="migrateFrom();"><i class="fas fa-file-export"></i></button>
+        -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal bd-example-modal-lg fade" id="hideRankModal" tabindex="-1" role="dialog" aria-labbelledby="hideRankModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="hideRankModalLabel"><%= __('quizset.hiderankmodal.label') %></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="hiderankmodal-body">
+        <button id="hideRankBtn" class="btn btn-primary" onClick="hideRank();"><%= __('quizset.hiderankmodal.button') %></button>
       </div>
       <div class="modal-footer btn-center">
         <!--
@@ -498,7 +538,6 @@ function appendCardGroups( cardgroups_selector, num ){
 function selectQuiz( quiz_id, quiz_category, quiz_point ){
   console.log( 'selectQuiz: quiz_id = ' + quiz_id );
   $('#showAnswersBtn').css( 'display', 'none' );
-  $('#hideAnswersBtn').css( 'display', 'none' );
   $('#quizFinishBtn').css( 'display', 'block' );
   image_category = quiz_category;
   image_point = quiz_point;
@@ -517,24 +556,32 @@ function quizFinish(){
 }
 
 function showAnswers(){
-  $('#showAnswersBtn').css( 'display', 'none' );
-  $('#hideAnswersBtn').css( 'display', 'block' );
+  //. hideAnswers ダイアログを表示する
+  $('body').removeClass( 'modal-open' );
+  $('.modal-backdrop').remove();
+  $('#hideAnswersModal').modal();
+
   socketio.emit( 'show_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>', answers: answers[_quiz_id] } );
 
   return false;
 }
 
 function hideAnswers(){
-  $('#showAnswersBtn').css( 'display', 'block' );
-  $('#hideAnswersBtn').css( 'display', 'none' );
+  //. hideAnswers ダイアログを非表示にする
+  $('body').removeClass( 'modal-open' );
+  $('.modal-backdrop').remove();
+  $('#hideAnswersModal').modal( 'hide' );
+
   socketio.emit( 'hide_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
 
   return false;
 }
 
 function showRank(){
-  $('#showRankBtn').css( 'display', 'none' );
-  $('#hideRankBtn').css( 'display', 'block' );
+  //. hideRank ダイアログを表示する
+  $('body').removeClass( 'modal-open' );
+  $('.modal-backdrop').remove();
+  $('#hideRankModal').modal();
 
   //. 現在のランキング情報をメッセージに含める
   socketio.emit( 'show_rank', { room: '<%= room %>', quizset_id: '<%= id %>', answers: answers, names: names } );
@@ -543,8 +590,11 @@ function showRank(){
 }
 
 function hideRank(){
-  $('#showRankBtn').css( 'display', 'block' );
-  $('#hideRankBtn').css( 'display', 'none' );
+  //. hideRank ダイアログを表示する
+  $('body').removeClass( 'modal-open' );
+  $('.modal-backdrop').remove();
+  $('#hideRankModal').modal( 'hide' );
+
   socketio.emit( 'hide_rank', { room: '<%= room %>', quizset_id: '<%= id %>' } );
 
   return false;

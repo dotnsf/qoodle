@@ -20,5 +20,22 @@
 	"common.button.post": "送信",
 	"common.comment": "コメント",
 	"common.history": "履歴",
-	"dummy": "dummy"
+	"quizset.list.col1.label": "カテゴリー",
+	"quizset.list.col2.label": "画像",
+	"quizset.list.col3.label": "問題文",
+	"quizset.list.col4.label": "コメント",
+	"quizset.list.col5.label": "得点",
+	"quizset.tab.quiz.label": "出題画面",
+	"quizset.tab.answers.label": "解答画面",
+	"quizset.tab.rank.label": "ランキング画面",
+	"quizset.quizfinish.button": "解答終了",
+	"quizset.showanswers.button": "解答一覧表示",
+	"quizset.showrank.button": "ランキング表示",
+	"quizset.answersmodal.label": "解答一覧",
+	"quizset.hideanswersmodal.label": "解答一覧表示中",
+	"quizset.hideanswersmodal.button": "表示終了",
+	"quizset.hiderankmodal.label": "ランキング表示中",
+	"quizset.hiderankmodal.button": "表示終了",
+	"dummy": "dummy",
+	"quizset.answersmodallabel": "quizset.answersmodallabel"
 }
