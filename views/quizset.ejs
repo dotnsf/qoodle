@@ -537,6 +537,10 @@ function appendCardGroups( cardgroups_selector, num ){
 
 function selectQuiz( quiz_id, quiz_category, quiz_point ){
   console.log( 'selectQuiz: quiz_id = ' + quiz_id );
+  activeTab( 'tab-pane-quiz' );
+  enableTab( 'tab-pane-quiz' );
+  enableTab( 'tab-pane-answers' );
+  enableTab( 'tab-pane-rank' );
   $('#showAnswersBtn').css( 'display', 'none' );
   $('#quizFinishBtn').css( 'display', 'block' );
   image_category = quiz_category;
@@ -549,6 +553,9 @@ function selectQuiz( quiz_id, quiz_category, quiz_point ){
 
 function quizFinish(){
   $('#quizFinishBtn').css( 'display', 'none' );
+  disableTab( 'tab-pane-quiz' );
+  enableTab( 'tab-pane-answers' );
+  disableTab( 'tab-pane-rank' );
   //setTimeout( function(){
     $('#showAnswersBtn').css( 'display', 'block' );
     socketio.emit( 'quiz_finish', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
@@ -571,6 +578,10 @@ function hideAnswers(){
   $('body').removeClass( 'modal-open' );
   $('.modal-backdrop').remove();
   $('#hideAnswersModal').modal( 'hide' );
+
+  enableTab( 'tab-pane-quiz' );
+  enableTab( 'tab-pane-answers' );
+  enableTab( 'tab-pane-rank' );
 
   socketio.emit( 'hide_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
 
@@ -621,6 +632,23 @@ function open16_click( num ){
     image_16_open ++;
     socketio.emit( 'quiz_hint', { room: '<%= room %>', category: 2, num: num, open: image_16_open } );
   }
+}
+
+//. for #2
+function activeTab( tabid ){
+  $('.nav-tabs a[href="#' + tabid + '"]').tab( 'show' );
+}
+
+function enableTab( tabid ){
+  //$('.nav-tabs a[href="#' + tabid + '"]').parent().prop( 'disabled', '' );
+  //$('.nav-tabs a[href="#' + tabid + '"]').parent().removeAttr( 'disabled' );
+  $('.nav-tabs a[href="#' + tabid + '"]').attr( 'data-toggle', 'tab' );
+}
+
+function disableTab( tabid ){
+  //$('.nav-tabs a[href="#' + tabid + '"]').parent().prop( 'disabled', 'disable' );
+  //$('.nav-tabs a[href="#' + tabid + '"]').prop( 'data-toggle', '' );
+  $('.nav-tabs a[href="#' + tabid + '"]').removeAttr( 'data-toggle' );
 }
 </script>
 </body>
