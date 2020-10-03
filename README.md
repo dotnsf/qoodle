@@ -16,9 +16,7 @@ Quiz platform, based on [Doodle Share](https://github.com/dotnsf/doodle_share/).
 
 - Node.js runtime
 
-- IBM Cloudant(Optional)
-
-    - Create one database named **doodleshare**
+- IBM Cloudant
 
 
 ## Install
@@ -33,32 +31,48 @@ Quiz platform, based on [Doodle Share](https://github.com/dotnsf/doodle_share/).
 
     - exports.db_password : password for IBM Cloudant
 
-    - exports.admin_username : username for Basic Authenticate to access /view and /admin
+    - exports.admin_username : username for Basic Authenticate to access /quizset and /admin
 
-    - exports.admin_password : password for Basic Authenticate to access /view and /admin
+    - exports.admin_password : password for Basic Authenticate to access /quizset and /admin
 
     - exports.defaultroom : default room name when not specified
-
-    - exports.intervalms : default reload interval milliseconds for screen sharing
 
 - Deploy application into IBM Cloud
 
 
+## Prerequisites for Quiz conference owner
+
+Conference owner need *2* PCs to have Quiz conference:
+
+- PC for Operation.
+
+- PC for Screen Sharing.
+
+
+## Prerequisites for Quiz participant
+
+Participant need *1* PC and *1" smartphone:
+
+- PC to watch shared screen(Quiz).
+
+- Smartphone for answering to quiz.
+
+
+
 ## How to use
 
-- First, administrator need to access to /view **with Chrome** so that it can handle all client.
+- First, administrator need to access to /admin, and edit quiz and quizset.
 
-    - If you want to specify room name, then access to /view?room=XXXX
+- Next, administrator click quizset id to browse /quizset page.
 
-- Then user may access to / with their smartphone, and input his/her name.
+    - If you want to use room name, then access to /quizset?room=XXXX
 
-    - If you want to use room name, then access to /?room=XXXX
+- Then administrator may open /share(?room=XXXX) page **with different PC**, and share this screen into web conference.
 
-- When user draw their doodle in their smartphone, all doodles would be shown in /view screen.
+- Then participant user attend web conference, and browse shared screen, that QR code is embedded.
 
-    - (Optional)User can **save** their doodle, if Cloudant is ready.
+- At last, participant user may read its QR code with their smartphone, input his/her name, and answering board is shown in their smartphone screen.
 
-- When administrator access to /admin, they can view all saved images.
 
 
 ## Copyright
