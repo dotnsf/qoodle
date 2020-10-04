@@ -42,7 +42,7 @@ function reloadQuizs(){
     url: '/dbapi/quizs?user_id=' + uuid,
     success: function( result ){
       if( result && result.status ){
-        var categories = [ '一般クイズ', 'フリーテキスト', '16分割', 'ぼかし' ];
+        var categories = [ '<%= __("admin.category.0") %>', '<%= __("admin.category.1") %>', '<%= __("admin.category.2") %>', '<%= __("admin.category.3") %>' ];
         result.quizs.forEach( function( quiz ){
           var tr = '<tr>'
             + '<td>' + quiz._id + '</td>'
@@ -59,26 +59,6 @@ function reloadQuizs(){
           $('#quiz_table_body').append( tr );
         });
       }
-      /*
-      var tr = '<tr>'
-        + '<td><input type="text" class="form-control" id="edit_quiz_id" value=""/></td>'
-        + '<td>'
-        + '<select id="edit_quiz_category">'
-        + '<option value="0">' + categories[0] + '</option>'
-        //+ '<option value="1">' + categories[1] + '</option>'
-        + '<option value="2">' + categories[2] + '</option>'
-        + '<option value="3">' + categories[3] + '</option>'
-        + '</select>'
-        + '</td>'
-        + '<td><input type="text" class="form-control" id="edit_quiz_point" value=""/></td>'
-        + '<td><input type="text" class="form-control" id="edit_quiz_body" value=""/></td>'
-        + '<td><input type="text" class="form-control" id="edit_quiz_comment" value=""/></td>'
-        + '<td><input type="text" class="form-control" id="edit_quiz_img_url" value=""/></td>'
-        + '<td> - </td>'
-        + '<td><button class="btn btn-xs btn-success" onClick="saveQuiz();">Save</button></td>'
-        + '</tr>';
-      $('#quiz_table_body').append( tr );
-      */
     },
     error: function( err ){
       console.log( err );
@@ -105,16 +85,6 @@ function reloadQuizsets(){
           $('#quizset_table_body').append( tr );
         });
       }
-      /*
-      var tr = '<tr>'
-        + '<td><input type="text" class="form-control" id="edit_quizset_id" value=""/></td>'
-        + '<td><input type="text" class="form-control" id="edit_quizset_subject" value=""/></td>'
-        + '<td><input type="text" class="form-control" id="edit_quizset_ids" value="" placeholder=\'["xxx","yyy"]\'/></td>'
-        + '<td> - </td>'
-        + '<td><button class="btn btn-xs btn-success" onClick="saveQuizset();">Save</button></td>'
-        + '</tr>';
-      $('#quizset_table_body').append( tr );
-      */
     },
     error: function( err ){
       console.log( err );
@@ -286,7 +256,7 @@ function editQuizset( quizset ){
 }
 
 function delQuiz( id ){
-  if( confirm( id + ' のクイズを削除します。よろしいですか？' ) ){
+  if( confirm( '<%= __("admin.deletequiz.confirm.0") %>' + id + '<%= __("admin.deletequiz.confirm.1") %>' ) ){
     $.ajax({
       type: 'DELETE',
       url: '/dbapi/quiz/' + id,
@@ -302,7 +272,7 @@ function delQuiz( id ){
 }
 
 function delQuizset( id ){
-  if( confirm( id + ' のクイズセットを削除します。よろしいですか？' ) ){
+  if( confirm( '<%= __("admin.deletequizset.confirm.0") %>' + id + '<%= __("admin.deletequizset.confirm.1") %>' ) ){
     $.ajax({
       type: 'DELETE',
       url: '/dbapi/quizset/' + id,
@@ -352,41 +322,38 @@ html, body{
 
 <div class="container_ p-3" id="admin_body">
   <ul class="nav nav-tabs">
-    <li class="nav-item"><a href="#tab-pane-quizset" data-toggle="tab" class="nav-link">クイズセット</a></li>
-    <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active">クイズ</a></li>
+    <li class="nav-item"><a href="#tab-pane-quizset" data-toggle="tab" class="nav-link"><%= __("admin.tab.quizset.label") %></a></li>
+    <li class="nav-item"><a href="#tab-pane-quiz" data-toggle="tab" class="nav-link active"><%= __("admin.tab.quiz.label") %></a></li>
   </ul>
   <div class="tab-content">
     <div id="tab-pane-quizset" class="tab-pane">
-      <table class="table table-bordered">
+      <table class="table table-bordered list-table">
         <thead id="quizset_table_heat">
-          <tr><th>#</th><th>subject</th><th>ids</th><th>updated</th><th>actions</th></tr>
+          <tr><th>#</th><th><%= __("admin.quizsettable.column.1") %></th><th><%= __("admin.quizsettable.column.2") %></th><th><%= __("admin.quizsettable.column.3") %></th><th><%= __("admin.quizsettable.column.4") %></th></tr>
         </thead>
         <tbody id="quizset_table_body">
         </tbody>
       </table>
 
       <div class="container">
-      <table class="table table-bordered list-table">
+      <table class="table table-bordered">
         <tr>
-          <td>ID</td>
+          <td><%= __("admin.quizsettable.column.0") %></td>
           <td><input type="text" class="form-control" id="edit_quizset_id" value="" readonly="readonly"/></td>
         </tr>
         <tr>
-          <td>subject</td>
+          <td><%= __("admin.quizsettable.column.1") %></td>
           <td><input type="text" class="form-control" id="edit_quizset_subject" value=""/></td>
         </tr>
         <tr>
-          <td>quiz ids</td>
+          <td><%= __("admin.quizsettable.column.2") %></td>
           <td>
-            <!--
-            <input type="text" class="form-control" id="edit_quizset_ids" value="" placeholder='["xxx","yyy"]'/>
-            -->
             <textarea class="form-control" id="edit_quizset_ids" placeholder='["xxx","yyy"]'></textarea>
           </td>
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><button class="btn btn-success" onClick="saveQuizset();">Save</button></td>
+          <td><button class="btn btn-success" onClick="saveQuizset();"><%= __("admin.quizsettable.savebutton.label") %></button></td>
         </tr>
       </table>
       </div>
@@ -394,7 +361,7 @@ html, body{
     <div id="tab-pane-quiz" class="tab-pane active">
       <table class="table table-bordered list-table">
         <thead id="quiz_table_heat">
-          <tr><th>#</th><th>category</th><th>point</th><th>body</th><th>comment</th><th>image_url</th><th>updated</th><th>actions</th></tr>
+          <tr><th>#</th><th><%= __("admin.quiztable.column.1") %></th><th><%= __("admin.quiztable.column.2") %></th><th><%= __("admin.quiztable.column.3") %></th><th><%= __("admin.quiztable.column.4") %></th><th><%= __("admin.quiztable.column.5") %></th><th><%= __("admin.quiztable.column.6") %></th><th><%= __("admin.quiztable.column.7") %></th></tr>
         </thead>
         <tbody id="quiz_table_body">
         </tbody>
@@ -403,39 +370,41 @@ html, body{
       <div class="container">
       <table class="table table-bordered">
         <tr>
-          <td>ID</td>
+          <td><%= __("admin.quiztable.column.0") %></td>
           <td><input type="text" class="form-control" id="edit_quiz_id" value="" readonly="readonly"/></td>
         </tr>
         <tr>
-          <td>category</td>
+          <td><%= __("admin.quiztable.column.1") %></td>
           <td>
           <select id="edit_quiz_category">
-          <option value="0">一般クイズ</option>
-          <option value="1">フリーテキスト</option>
-          <option value="2">16分割</option>
-          <option value="3">ぼかし</option>
+          <option value="0"><%= __("admin.category.0") %></option>
+          <!--
+          <option value="1"><%= __("admin.category.1") %></option>
+            -->
+          <option value="2"><%= __("admin.category.2") %></option>
+          <option value="3"><%= __("admin.category.3") %></option>
           </select>
           </td>
         </tr>
         <tr>
-          <td>point</td>
+          <td><%= __("admin.quiztable.column.2") %></td>
           <td><input type="text" class="form-control" id="edit_quiz_point" value=""/></td>
         </tr>
         <tr>
-          <td>body</td>
+          <td><%= __("admin.quiztable.column.3") %></td>
           <td><input type="text" class="form-control" id="edit_quiz_body" value=""/></td>
         </tr>
         <tr>
-          <td>comment</td>
+          <td><%= __("admin.quiztable.column.4") %></td>
           <td><input type="text" class="form-control" id="edit_quiz_comment" value=""/></td>
         </tr>
         <tr>
-          <td>img_url</td>
+          <td><%= __("admin.quiztable.column.5") %></td>
           <td><input type="text" class="form-control" id="edit_quiz_img_url" value=""/></td>
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><button class="btn btn-success" onClick="saveQuiz();">Save</button></td>
+          <td><button class="btn btn-success" onClick="saveQuiz();"><%= __("admin.quiztable.savebutton.label") %></button></td>
         </tr>
       </table>
       </div>
