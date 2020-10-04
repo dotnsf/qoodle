@@ -252,7 +252,7 @@ function editQuizset( quizset ){
     $('#edit_quizset_id').val( '' );
   }
   $('#edit_quizset_subject').val( quizset.subject );
-  $('#edit_quizset_ids').val( JSON.stringify( quizset.quiz_ids ) );
+  $('#edit_quizset_ids').val( JSON.stringify( quizset.quiz_ids, null , 2 ) );
 }
 
 function delQuiz( id ){
@@ -348,7 +348,7 @@ html, body{
         <tr>
           <td><%= __("admin.quizsettable.column.2") %></td>
           <td>
-            <textarea class="form-control" id="edit_quizset_ids" placeholder='["xxx","yyy"]'></textarea>
+            <textarea class="form-control" rows="5" id="edit_quizset_ids" placeholder='[&#13;  "xxx",&#13;  "yyy"&#13;]'></textarea>
           </td>
         </tr>
         <tr>
