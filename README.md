@@ -42,7 +42,7 @@ Quiz platform, based on [Doodle Share](https://github.com/dotnsf/doodle_share/).
 
 ## Prerequisites for Quiz conference owner
 
-Conference owner need *2* PCs to have Quiz conference:
+Conference owner need **2 PCs** to have Quiz conference:
 
 - PC for Operation.
 
@@ -51,7 +51,7 @@ Conference owner need *2* PCs to have Quiz conference:
 
 ## Prerequisites for Quiz participant
 
-Participant need *1* PC and *1" smartphone:
+Participant need **1 PC** and **1 smartphone**:
 
 - PC to watch shared screen(Quiz).
 
@@ -65,7 +65,7 @@ Participant need *1* PC and *1" smartphone:
 
 - Next, administrator click quizset id to browse /quizset page.
 
-    - If you want to use room name, then access to /quizset?room=XXXX
+    - If you want to use room name, then set room field or access to /quizset?room=XXXX
 
 - Then administrator may open /share(?room=XXXX) page **with different PC**, and share this screen into web conference.
 

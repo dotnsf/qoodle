@@ -339,13 +339,9 @@ html, body{
   </ul>
   <div class="tab-content">
     <div id="tab-pane-quizset" class="tab-pane active">
-      <div class="text-right list-table">
-        <input type="text" id="room" value="" placeholder="room"/>
-      </div>
-
       <table class="table table-bordered list-table">
         <thead id="quizset_table_heat">
-          <tr><th>#</th><th><%= __("admin.quizsettable.column.1") %></th><th><%= __("admin.quizsettable.column.2") %></th><th><%= __("admin.quizsettable.column.3") %></th><th><%= __("admin.quizsettable.column.4") %></th></tr>
+          <tr><th># <input type="text" id="room" value="" placeholder="room"/> </th><th><%= __("admin.quizsettable.column.1") %></th><th><%= __("admin.quizsettable.column.2") %></th><th><%= __("admin.quizsettable.column.3") %></th><th><%= __("admin.quizsettable.column.4") %></th></tr>
         </thead>
         <tbody id="quizset_table_body">
         </tbody>
