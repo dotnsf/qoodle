@@ -291,6 +291,8 @@ $(function(){
 
   socketio.on( 'quiz_finish_view', function( msg ){
     console.log( 'quiz_finish_view', msg );
+
+    $('#point').html( msg.comment );
     //. ５秒カウント後に強制ロック
     //setTimeout( function(){
       socketio.emit( 'lock_answer', { room: '<%= room %>', quiz_id: msg.quiz_id, quizset_id: msg.quizset_id } );

@@ -183,6 +183,7 @@ var image_blur = -1;
 var blur_ratio = 1;
 var image_16_open = 0;
 var _quiz_id = null;
+var _quiz_comment = '';
 
 var answers = {};
 var names = {};
@@ -218,7 +219,7 @@ $(function(){
                 //console.log( 'quiz_id = ' + quiz_id + ', _id = ' + qresult.body._id );
                 var cat = ['一般','フリーテキスト','16分割','ぼかし'][qresult.body.category];
                 $('#quizcat_'+qresult.body._id).html( cat );
-                var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ');">' + qresult.body.body + '</a>';
+                var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ', \'' + qresult.body.comment + '\');">' + qresult.body.body + '</a>';
                 $('#quizbody_'+qresult.body._id).html( a );
                 $('#quizcomment_'+qresult.body._id).html( qresult.body.comment );
                 $('#quizpoint_'+qresult.body._id).html( qresult.body.point );
@@ -329,6 +330,7 @@ $(function(){
     setTimeout( function(){
       var quiz_id = msg.quiz_id;
       _quiz_id = quiz_id;
+      _quiz_comment = msg.quiz_comment;
       $.ajax({
         type: 'GET',
         url: '/dbapi/quiz/' + quiz_id,
@@ -338,7 +340,7 @@ $(function(){
             var html = '<h3>' + result.body.body + '</h3>';
             if( result.body.img_url ){
               if( result.body.category != 2 ){
-                html += '<div><img id="q_image" src="' + result.body.img_url + '" width="100%"/></div>';
+                html += '<div><img id="q_image" src="' + result.body.img_url + '" height="90%"/></div>';
               }else{
                 html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
               }
@@ -535,7 +537,7 @@ function appendCardGroups( cardgroups_selector, num ){
   });
 }
 
-function selectQuiz( quiz_id, quiz_category, quiz_point ){
+function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   console.log( 'selectQuiz: quiz_id = ' + quiz_id );
   activeTab( 'tab-pane-quiz' );
   enableTab( 'tab-pane-quiz' );
@@ -546,7 +548,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point ){
   image_category = quiz_category;
   image_point = quiz_point;
   if( !answers[quiz_id] ){ answers[quiz_id] = {}; }
-  socketio.emit( 'quiz_select', { room: '<%= room %>', quiz_id: quiz_id, quizset_id: '<%= id %>', quiz_category: quiz_category, quiz_point: quiz_point } );
+  socketio.emit( 'quiz_select', { room: '<%= room %>', quiz_id: quiz_id, quizset_id: '<%= id %>', quiz_category: quiz_category, quiz_point: quiz_point, quiz_comment: quiz_comment } );
 
   return false;
 }
@@ -558,7 +560,8 @@ function quizFinish(){
   disableTab( 'tab-pane-rank' );
   //setTimeout( function(){
     $('#showAnswersBtn').css( 'display', 'inline' );
-    socketio.emit( 'quiz_finish', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+    console.log( '_quiz_comment', _quiz_comment );
+    socketio.emit( 'quiz_finish', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>', comment: _quiz_comment } );
   //}, 5000 );
 }
 
