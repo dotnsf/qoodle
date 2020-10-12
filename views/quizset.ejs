@@ -542,7 +542,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point ){
   enableTab( 'tab-pane-answers' );
   enableTab( 'tab-pane-rank' );
   $('#showAnswersBtn').css( 'display', 'none' );
-  $('#quizFinishBtn').css( 'display', 'block' );
+  $('#quizFinishBtn').css( 'display', 'inline' );
   image_category = quiz_category;
   image_point = quiz_point;
   if( !answers[quiz_id] ){ answers[quiz_id] = {}; }
@@ -557,7 +557,7 @@ function quizFinish(){
   enableTab( 'tab-pane-answers' );
   disableTab( 'tab-pane-rank' );
   //setTimeout( function(){
-    $('#showAnswersBtn').css( 'display', 'block' );
+    $('#showAnswersBtn').css( 'display', 'inline' );
     socketio.emit( 'quiz_finish', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
   //}, 5000 );
 }
