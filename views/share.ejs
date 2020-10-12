@@ -228,7 +228,8 @@ $(function(){
           var html = '<h2>' + result.body.body + '</h2>';
           if( result.body.img_url ){
             if( image_category != 2 ){
-              html += '<div><img id="q_image" src="' + result.body.img_url + '" width="100%" style="display: none;"/></div>';
+              //html += '<div><img id="q_image" src="' + result.body.img_url + '" height="90%" style="display: none;"/></div>';
+              html += '<img id="q_image" src="' + result.body.img_url + '" height="90%" style="display: none;"/>';
             }else{
               html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
             }
