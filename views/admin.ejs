@@ -261,6 +261,7 @@ function delQuiz( id ){
     $.ajax({
       type: 'DELETE',
       url: '/dbapi/quiz/' + id,
+      data: { user_id: uuid },
       success: function( result ){
         //location.href = '/admin';
         reloadQuizs();
@@ -277,6 +278,7 @@ function delQuizset( id ){
     $.ajax({
       type: 'DELETE',
       url: '/dbapi/quizset/' + id,
+      data: { user_id: uuid },
       success: function( result ){
         //location.href = '/admin';
         reloadQuizsets();
