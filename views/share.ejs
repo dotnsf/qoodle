@@ -419,6 +419,19 @@ $(function(){
         }
       }
 
+      //. (#10)ランキング順にソート
+      //. uuids[] 配列を rank_by_uuid[uuids[]] が昇順になるようにソートする
+      var tmp = [];
+      uuids.forEach( function( uuid_ ){
+        tmp.push( { uuid: uuid_, rank: rank_by_uuid[uuid_] } );
+      });
+      tmp.sort( sortByRank );
+
+      uuids = [];
+      tmp.forEach( function( t ){
+        uuids.push( t.uuid );
+      });
+
       //. thead 作成
       var thead = '<thead><tr>';
       thead += '<th>Name</th>';
@@ -534,6 +547,17 @@ function appendCardGroups( cardgroups_selector, num ){
     $('#image_'+socket_id).prop( 'title', img.title );
     $('#image_'+socket_id).prop( 'ts', img.ts );
   });
+}
+
+function sortByRank( a, b ){
+  var r = 0;
+  if( a.rank < b.rank ){
+    r = -1;
+  }else if( a.rank > b.rank ){
+    r = 1;
+  }
+
+  return r;
 }
 </script>
 </body>
