@@ -320,7 +320,7 @@ paths:
         - name: quizset_id
           type: string
           in: query
-          description: quizset id
+          description: quizset id(deprecated)
         - name: limit
           type: integer
           in: query
@@ -646,20 +646,20 @@ definitions:
     type: object
     properties:
       quiz_id:
-        type: string
+        type: object
         description: クイズID
-      quizset_id:
-        type: string
-        description: クイズセットID
-      image_id:
-        type: string
-        description: 画像ID
-      point:
-        type: integer
-        description: 得点
-      user_id:
-        type: string
-        description: ユーザーID
-      user_name:
-        type: string
-        description: ユーザー名
+#     quizset_id:
+#       type: string
+#       description: クイズセットID
+#     image_id:
+#       type: string
+#       description: 画像ID
+#     point:
+#       type: integer
+#       description: 得点
+#     user_id:
+#       type: string
+#       description: ユーザーID
+#     user_name:
+#       type: string
+#       description: ユーザー名

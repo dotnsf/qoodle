@@ -529,19 +529,48 @@ router.post( '/answer', function( req, res ){
   if( db_answer ){
     var id = generateId();
     var ts = ( new Date() ).getTime();
+
+    var answers = req.body.answers ? req.body.answers : null;
+    /*
+     * user_name ?
+     * correct ?
+     *
+     answers = {
+       quiz_id: {
+         uuid: {
+	   point: 10,
+	   correct: true
+	 },
+         uuid: {
+	   point: 5,
+	   correct: false
+	 }, 
+	   :
+       },
+       quiz_id: {
+       },
+        :
+     }
+     */
+
+    /*
     var quiz_id = req.body.quiz_id ? req.body.quiz_id : '';
     var quizset_id = req.body.quizset_id ? req.body.quizset_id : '';
     var point = req.body.point ? req.body.point : 0;
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
+    */
     var params = {
       _id: id,
       type: 'answer',
+      /*
       quiz_id: quiz_id,
       quizset_id: quizset_id,
       point: point,
       user_id: user_id,
       user_name: user_name,
+      */
+      answers: answers,
       crated: ts,
       updated: ts
     };
@@ -595,7 +624,6 @@ router.get( '/answers', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_answer ){
-    //. Cloudant から削除
     db_answer.list( { include_docs: true }, function( err1, body1, header1 ){
       if( err1 ){
         err1.image_id = "error-1";
