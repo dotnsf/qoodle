@@ -315,12 +315,14 @@ $(function(){
   socketio.on( 'quiz_correct_view', function( msg ){
     console.log( 'quiz_correct_view', msg );
 
+    /*
     $('.card').removeClass( 'border-secondary' );
     $('.card').removeClass( 'border-warning' );
     $('.card').removeClass( 'border-success' );
     $('.my_a').removeClass( 'btn-secondary' );
     $('.my_a').removeClass( 'btn-warning' );
     $('.my_a').removeClass( 'btn-success' );
+    */
 
     if( msg.correct ){
       $('#card_'+msg.socket_id).removeClass( 'border-warning');

@@ -272,7 +272,7 @@ $(function(){
       var card = '<div id="card_' + socket_id + '" class="card border-' + color + '" style="cursor: pointer;">'
         + '<div class="card-body text-' + color + '">'
         //+ '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="btn btn-xs btn-' + color + '" onClick="removeCard(\'card_' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
-        + '<h4 class="card-title"><a id="a_' + socket_id + '" href="#" class="my_a btn btn-xs btn-' + color + '" onClick="selectSocket(\'' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
+        + '<h4 class="card-title"><a id="a_' + socket_id + '" class="my_a btn btn-xs btn-' + color + '" onClick="selectSocket(\'' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
         + '</div>'
         + '<a href="#box_content" id="box_content_' + socket_id + '" title="' + msg.name + '">'
         + '<img class="card-img-bottom" id="image_' + socket_id + '" alt="(image of ' + msg.name + ')" ts="' + msg.timestamp + '"/>'
@@ -471,6 +471,8 @@ function selectSocket( socket_id ){
       socketio.emit( 'quiz_correct', { room: '<%= room %>', socket_id: socket_id, correct: true } );
     }
   }
+
+  return false;
 }
 
 function removeCard( card_id ){
