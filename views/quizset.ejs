@@ -404,7 +404,6 @@ $(function(){
 
   socketio.on( 'quiz_finish_view', function( msg ){
     console.log( 'quiz_finish_view', msg );
-    //console.log( 'answers[target_quiz_id]', answers[msg.quiz_id] ); //. この時点で既におかしい
   });
 
   socketio.on( 'quiz_fixed_view', function( msg ){
@@ -422,16 +421,13 @@ $(function(){
     if( answers[target_quiz_id] && !answers[target_quiz_id][target_uuid] ){
       var answer = { point: image_point, correct: false };
       if( image_category == 2 ){
-        answer.point = 17;
+        answer.point = 17 - image_16_open;  //. #14
       }else if( image_category == 3 ){
         answer.point = parseInt( $('#rng').val() ) + 1;
       }
       answers[target_quiz_id][target_uuid] = answer;
-
-      //. ここまでは OK
-      console.log( 'answers[target_quiz_id]', answers[target_quiz_id] );
     }
-    console.log( 'answers[target_quiz_id]2', answers[target_quiz_id] );
+    console.log( 'answers[target_quiz_id]', answers[target_quiz_id] );
   });
 
   socketio.on( 'quiz_correct_view', function( msg ){
@@ -561,7 +557,6 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
 }
 
 function quizFinish(){
-  //console.log( 'answers[_quiz_id]', answers[_quiz_id] ); //. この時点で既におかしい
   $('#quizFinishBtn').css( 'display', 'none' );
   disableTab( 'tab-pane-quiz' );
   enableTab( 'tab-pane-answers' );
