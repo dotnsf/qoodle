@@ -221,7 +221,7 @@ $(function(){
                 //console.log( 'quiz_id = ' + quiz_id + ', _id = ' + qresult.body._id );
                 var cat = ['一般','フリーテキスト','16分割','ぼかし'][qresult.body.category];
                 $('#quizcat_'+qresult.body._id).html( cat );
-                var a = '<a href="#" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ', \'' + qresult.body.comment + '\');">' + qresult.body.body + '</a>';
+                var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ', \'' + qresult.body.comment + '\');">' + qresult.body.body + '</a>';
                 $('#quizbody_'+qresult.body._id).html( a );
                 $('#quizcomment_'+qresult.body._id).html( qresult.body.comment );
                 $('#quizpoint_'+qresult.body._id).html( qresult.body.point );
