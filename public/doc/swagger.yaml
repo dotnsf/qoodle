@@ -334,6 +334,24 @@ paths:
           description: 成功
         '400':
           description: エラー
+  /answer_bulk:
+    post:
+      tags:
+        - answer
+      summary: 解答バルク作成
+      description: 解答バルク作成
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/AnswerBulkRequest'
+      responses:
+        '200':
+          description: 成功
+        '400':
+          description: エラー
   /answer:
     post:
       tags:
@@ -646,20 +664,29 @@ definitions:
     type: object
     properties:
       quiz_id:
-        type: object
+        type: string
         description: クイズID
-#     quizset_id:
-#       type: string
-#       description: クイズセットID
-#     image_id:
-#       type: string
-#       description: 画像ID
-#     point:
-#       type: integer
-#       description: 得点
-#     user_id:
-#       type: string
-#       description: ユーザーID
-#     user_name:
-#       type: string
-#       description: ユーザー名
+     quizset_id:
+       type: string
+       description: クイズセットID
+     image_id:
+       type: string
+       description: 画像ID
+     point:
+       type: integer
+       description: 得点
+     user_id:
+       type: string
+       description: ユーザーID
+     user_name:
+       type: string
+       description: ユーザー名
+  AnswerBulkRequest:
+    type: object
+    properties:
+      answers:
+        type: object
+        description: 解答一覧オブジェクト
+     quizset_id:
+       type: string
+       description: クイズセットID

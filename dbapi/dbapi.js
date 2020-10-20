@@ -523,14 +523,63 @@ router.delete( '/quizset/:id', function( req, res ){
 
 
 //. answer
-router.post( '/answer', function( req, res ){
+router.post( '/answer_bulk', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_answer ){
-    var id = generateId();
-    var ts = ( new Date() ).getTime();
-
+    var quizset_id = req.body.quizset_id ? req.body.quizset_id : null;
     var answers = req.body.answers ? req.body.answers : null;
+    if( quizset_id && answers ){
+      var docs = [];
+      Object.keys( answers ).forEach( function( quiz_id ){
+        var o = answers[quiz_id];
+        Object.keys( o ).forEach( function( uuid ){
+          var point = o[uuid].point;
+          if( !o[uuid].correct ){
+            point = 0;
+          }
+          var id = generateId();
+          var ts = ( new Date() ).getTime();
+          var doc = {
+            _id: id,
+            type: 'answer',
+            quiz_id: quiz_id,
+            quizset_id: quizset_id,
+            point: point,
+            user_id: uuid,
+            user_name: '',
+            crated: ts,
+            updated: ts
+          };
+          docs.push( doc );
+        });
+      });
+
+      if( docs.length > 0 ){
+        console.log( 'docs', docs );
+        db_answer.bulk( { docs: docs }, function( err, body, header ){
+          if( err ){
+            console.log( err );
+            var p = JSON.stringify( { status: false, error: err }, null, 2 );
+            res.status( 400 );
+            res.write( p );
+            res.end();
+          }else{
+            var p = JSON.stringify( { status: true, body: body }, null, 2 );
+            res.write( p );
+            res.end();
+          }
+        });
+      }else{
+        res.status( 400 );
+        res.write( JSON.stringify( { status: false, error: 'no docs generated.' } ) );
+        res.end();
+      }
+    }else{
+      res.status( 400 );
+      res.write( JSON.stringify( { status: false, error: 'parameter answers not specified.' } ) );
+      res.end();
+    }
     /*
      * user_name ?
      * correct ?
@@ -538,39 +587,47 @@ router.post( '/answer', function( req, res ){
      answers = {
        quiz_id: {
          uuid: {
-	   point: 10,
-	   correct: true
-	 },
+	         point: 10,
+	         correct: true
+	       },
          uuid: {
-	   point: 5,
-	   correct: false
-	 }, 
-	   :
+	         point: 5,
+	         correct: false
+	       }, 
+	         :
        },
        quiz_id: {
        },
         :
      }
      */
+  }else{
+    res.status( 400 );
+    res.write( JSON.stringify( { status: false, error: 'db is not initialized.' } ) );
+    res.end();
+  }
+});
 
-    /*
+router.post( '/answer', function( req, res ){
+  res.contentType( 'application/json; charset=utf-8' );
+
+  if( db_answer ){
+    var id = generateId();
+    var ts = ( new Date() ).getTime();
+
     var quiz_id = req.body.quiz_id ? req.body.quiz_id : '';
     var quizset_id = req.body.quizset_id ? req.body.quizset_id : '';
     var point = req.body.point ? req.body.point : 0;
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
-    */
     var params = {
       _id: id,
       type: 'answer',
-      /*
       quiz_id: quiz_id,
       quizset_id: quizset_id,
       point: point,
       user_id: user_id,
       user_name: user_name,
-      */
-      answers: answers,
       crated: ts,
       updated: ts
     };
