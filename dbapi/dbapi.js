@@ -534,8 +534,8 @@ router.post( '/answer_bulk', function( req, res ){
       Object.keys( answers ).forEach( function( quiz_id ){
         var o = answers[quiz_id];
         Object.keys( o ).forEach( function( uuid ){
-          var point = o[uuid].point;
-          if( !o[uuid].correct ){
+          var point = parseInt( o[uuid].point );
+          if( !o[uuid].correct || o[uuid].correct != 'true' ){
             point = 0;
           }
           var id = generateId();
@@ -556,7 +556,6 @@ router.post( '/answer_bulk', function( req, res ){
       });
 
       if( docs.length > 0 ){
-        console.log( 'docs', docs );
         db_answer.bulk( { docs: docs }, function( err, body, header ){
           if( err ){
             console.log( err );
