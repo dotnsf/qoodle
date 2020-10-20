@@ -36,6 +36,8 @@
   "quizset.hideanswersmodal.button": "Hide",
   "quizset.hiderankmodal.label": "Now showing rank",
   "quizset.hiderankmodal.button": "Hide",
+  "quizset.recordanswers.button": "Record Answers to DB",
+  "quizset.recordanswers.recording": "Recording..",
   "admin.category.0": "General",
   "admin.category.1": "Freehand",
   "admin.category.2": "16 pieces",

@@ -36,6 +36,8 @@
 	"quizset.hideanswersmodal.button": "表示終了",
 	"quizset.hiderankmodal.label": "ランキング表示中",
 	"quizset.hiderankmodal.button": "表示終了",
+    "quizset.recordanswers.button": "得点をDBに記録",
+    "quizset.recordanswers.recording": "記録中..",
 	"admin.category.0": "一般クイズ",
 	"admin.category.1": "フリーテキスト",
 	"admin.category.2": "16分割",
