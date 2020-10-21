@@ -4,8 +4,8 @@
 <meta charset="UTF-8"/>
 <title><%= room %> - <%= id %></title>
 <script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"/>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 <script src="/cvi_busy_lib.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 
@@ -54,11 +54,23 @@ html, body{
   text-align: center;
   opacity: 0.6;
 }
+#my-navbar{
+  color: #f00;
+}
 </style>
 </head>
 <body>
 
-<h1 id="subject"><%= id %></h1>
+<nav class="navbar fixed-top">
+  <div class="navbar-header">
+  </div>
+  <div id="my-navbar">
+  </div>
+</nav>
+
+<div class="container" style="padding: 100px 0px;">
+  <h1 id="subject"><%= id %></h1>
+</div>
 
 <div class="container">
   <table class="table table-bordered">
@@ -102,6 +114,7 @@ html, body{
   </div>
 </div>
 
+<!-- modals -->
 <div class="modal bd-example-modal-lg fade" id="answersModal" tabindex="-1" role="dialog" aria-labbelledby="answersModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
@@ -168,6 +181,109 @@ html, body{
   </div>
 </div>
 
+<!-- toasts -->
+<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+<div style="position: absolute; top: 10px; right: 10px;">
+
+<div id="toast0" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast0.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast0.body') %>
+  </div>
+</div>
+
+<div id="toast1" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast1.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast1.body') %>
+  </div>
+</div>
+
+<div id="toast1a" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast1a.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast1a.body') %>
+  </div>
+</div>
+
+<div id="toast1b" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast1b.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast1b.body') %>
+  </div>
+</div>
+
+<div id="toast2" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast2.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast2.body') %>
+  </div>
+</div>
+
+<div id="toast3" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast3.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast3.body') %>
+  </div>
+</div>
+
+<div id="toast4" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast4.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast4.body') %>
+  </div>
+</div>
+
+<div id="toast5" class="toast" data-delay="3000" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header">
+    <strong class="mr-auto"><%= __('quizset.toast5.title') %></strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+  <%= __('quizset.toast5.body') %>
+  </div>
+</div>
+
+</div>
+</div>
+
 <script>
 var uuid = generateUUID();
 var socketio = null;
@@ -187,8 +303,21 @@ var image_16_open = 0;
 var _quiz_id = null;
 var _quiz_comment = '';
 
+var on_quiz = false;  //. #17
+
 var answers = {};
 var names = {};
+
+var messages = {
+  toast0: '<%= __("quizset.toast0.body") %>',
+  toast1: '<%= __("quizset.toast1.body") %>',
+  toast1a: '<%= __("quizset.toast1a.body") %>',
+  toast1b: '<%= __("quizset.toast1b.body") %>',
+  toast2: '<%= __("quizset.toast2.body") %>',
+  toast3: '<%= __("quizset.toast3.body") %>',
+  toast4: '<%= __("quizset.toast4.body") %>',
+  toast5: '<%= __("quizset.toast5.body") %>'
+};
 
 $(function(){
   socketio = io.connect();
@@ -368,6 +497,7 @@ $(function(){
             html += '</div>';
 
             $('#tab-pane-quiz').html( html );
+            $('#my-navbar').html('');
             if( result.body.category == 3 ){
               var e = document.getElementById( 'q_image' );
               var iid = setInterval( function(){
@@ -375,6 +505,7 @@ $(function(){
                   blur_ratio = Math.floor( e.naturalWidth / 100 );
                   clearInterval( iid );
                   changeBlur();
+                  $('#my-navbar').append(messages['toast1a']+'<br/>');
                 }
               }, 10 );
             }else if( result.body.category == 2 ){
@@ -388,8 +519,10 @@ $(function(){
                 }
                 tr += '</tr>';
                 $('#open16_table').append( tr );
+                $('#my-navbar').append(messages['toast1b']+'<br/>');
               }
             }
+            $('#my-navbar').append(messages['toast2']);
           }
         },
         error: function( e0, e1, e2 ){
@@ -447,6 +580,14 @@ function init(){
   //$(window).on( 'load resize', function(){
     resized();
   //});
+  $(window).on( 'load resize', function(){
+    var height = $('.navbar').height();
+    $('body').css( 'padding-top', height );
+  });
+
+  //. #18
+  $('#my-navbar').html( messages['toast0'] );
+  $('#my-navbar').append( '<br/>' + messages['toast1'] );
 }
 
 function resized(){
@@ -458,7 +599,8 @@ function resized(){
 
 function selectSocket( socket_id ){
   //. 送信前は採点できなくする
-  if( $('#card_'+socket_id).hasClass( 'border-success') || $('#card_'+socket_id).hasClass( 'border-warning') ){
+  //if( $('#card_'+socket_id).hasClass( 'border-success') || $('#card_'+socket_id).hasClass( 'border-warning') ){
+  if( !on_quiz ){  //. #17
     //. もう一度選択したらキャンセルできるようにしたい
     if( $('#card_'+socket_id).hasClass( 'border-success') ){
       $('#card_'+socket_id).removeClass( 'border-success');
@@ -544,6 +686,7 @@ function appendCardGroups( cardgroups_selector, num ){
 
 function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   console.log( 'selectQuiz: quiz_id = ' + quiz_id );
+  on_quiz = true;
   activeTab( 'tab-pane-quiz' );
   enableTab( 'tab-pane-quiz' );
   enableTab( 'tab-pane-answers' );
@@ -559,6 +702,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
 }
 
 function quizFinish(){
+  on_quiz = false;
   $('#quizFinishBtn').css( 'display', 'none' );
   disableTab( 'tab-pane-quiz' );
   enableTab( 'tab-pane-answers' );
@@ -568,6 +712,8 @@ function quizFinish(){
     console.log( '_quiz_comment', _quiz_comment );
     socketio.emit( 'quiz_finish', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>', comment: _quiz_comment } );
   //}, 5000 );
+  $('#my-navbar').html(messages['toast3']+'<br/>');
+  $('#my-navbar').append(messages['toast4']);
 }
 
 function showAnswers(){
@@ -592,6 +738,9 @@ function hideAnswers(){
   enableTab( 'tab-pane-rank' );
 
   socketio.emit( 'hide_answers', { room: '<%= room %>', quiz_id: _quiz_id, quizset_id: '<%= id %>' } );
+
+  $('#my-navbar').html(messages['toast5']+'<br/>');
+  $('#my-navbar').append(messages['toast1']);
 
   return false;
 }
