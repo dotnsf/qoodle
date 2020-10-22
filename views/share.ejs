@@ -436,6 +436,7 @@ $(function(){
 
       //. thead 作成
       var thead = '<thead><tr>';
+      thead += '<th>Ranking</th>';
       thead += '<th>Name</th>';
       for( var i = 0; i < quizs.length; i ++ ){
         var quiz_id_ = quizs[i];
@@ -443,19 +444,18 @@ $(function(){
         thead += '<th>' + ( i + 1 ) + '</th>';
       }
       thead += '<th>Sum</th>';
-      thead += '<th>Ranking</th>';
       thead += '</tr></thead><tbody id="ranktable-body"></tbody>';
       $('#ranktable').html( thead );
 
       //. 参加者ごとに各問題ごとの得点を表形式で表記
       uuids.forEach( function( uuid_ ){
         var tr = '<tr>';
+        tr += '<td>' + rank_by_uuid[uuid_] + '</td></tr>';
         tr += '<td>' + ( msg.names[uuid_] ? msg.names[uuid_] : uuid_ ) + '</td>';   //. 名前にしたい
         quizs.forEach( function( quiz_id_ ){
           tr += '<td>' + point_by_uuid[uuid_][quiz_id_] + '</td>';
         });
         tr += '<td>' + points[uuid_] + '</td>';
-        tr += '<td>' + rank_by_uuid[uuid_] + '</td></tr>';
         $('#ranktable-body').append( tr );
       });
     }else{
