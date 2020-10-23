@@ -42,7 +42,7 @@ Quiz platform, based on [Doodle Share](https://github.com/dotnsf/doodle_share/).
 
 ## Prerequisites for Quiz conference owner
 
-Conference owner need **2 PCs** to have Quiz conference:
+Conference owner need **2 PCs** or **multi-monitor** to have Quiz conference:
 
 - PC for Operation.
 
