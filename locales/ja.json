@@ -47,7 +47,7 @@
 	"quizset.toast4.body": "採点が終了したら解答一覧を表示してください。",
 	"quizset.toast5.body": "次の問題に行く前にランキング画面タブから現時点でのランキングを表示することができます（表示しなくても構いません）。また参加者毎の記録を保存することもできます。",
 	"admin.category.0": "一般クイズ",
-	"admin.category.1": "フリーテキスト",
+	"admin.category.1": "ズームアウト",
 	"admin.category.2": "16分割",
 	"admin.category.3": "ぼかし",
 	"admin.tab.quizset.label": "クイズセット",

@@ -10,6 +10,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/qrcode.min.js"></script>
 
+<link rel="stylesheet" href="//unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
+<script src="//unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+
 <link href="/colorbox.css" rel="stylesheet"/>
 <script src="/jquery.colorbox-min.js"></script>
 <script src="/common.js"></script>
@@ -151,6 +154,12 @@ var on_quiz = false;  //. #17
 var answers = {};
 var names = {};
 
+//var map = null;  //. #22
+var zoomlevel = 0;  //. #22
+
+var points = {};  //. #23
+var current_point = 0;
+
 $(function(){
   socketio = io.connect();
 
@@ -184,7 +193,7 @@ $(function(){
             success: function( qresult ){
               if( qresult && qresult.status && qresult.body ){
                 //console.log( 'quiz_id = ' + quiz_id + ', _id = ' + qresult.body._id );
-                var cat = ['一般','ズームアウト','16分割','ぼかし'][qresult.body.category];
+                var cat = ['<%= __("admin.category.0") %>','<%= __("admin.category.1") %>','<%= __("admin.category.2") %>','<%= __("admin.category.3") %>'][qresult.body.category];
                 $('#quizcat_'+qresult.body._id).html( cat );
                 var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ', \'' + qresult.body.comment + '\');">' + qresult.body.body + '</a>';
                 $('#quizbody_'+qresult.body._id).html( a );
@@ -195,8 +204,8 @@ $(function(){
                   $('#quizimg_'+qresult.body._id).html( img );
 
                   //. 通常問題以外はそのまま表示したくない・・・
-                  if( cat != '一般' ){
-                    b = 10;
+                  if( qresult.body.category != 0 ){
+                    b = 10;  //. ぼかして表示
                     var t = $('#quizimg_'+qresult.body._id)[0];
                     t.style['-ms-filter'] = 'blur(' + b + 'px)';
                     t.style['filter'] = 'blur(' + b + 'px)';
@@ -252,6 +261,9 @@ $(function(){
         + '</div>';
       cards.push( card );
 
+      //. #24（何度も同じ id に対して設定しているのがダメ？）
+      $('#box_content_'+socket_id).colorbox({ inline: true, transition: 'none', width: "90%", height: "90%", onOpen: function(){ zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
+
       //. カードグループを必要数だけ追加
       appendCardGroups( '#card-groups', cards.length );
     }
@@ -270,6 +282,9 @@ $(function(){
         $('#image_'+socket_id).prop( 'src', msg.image_src );
         $('#image_'+socket_id).prop( 'title', msg.comment );
         $('#image_'+socket_id).prop( 'ts', msg.timestamp );
+
+        //. #23
+        points[socket_id] = current_point;
 
         //. 再描画用に記録
         var img = {
@@ -308,7 +323,6 @@ function resized(){
 
 function selectSocket( socket_id ){
   //. 送信前は採点できなくする
-  //if( $('#card_'+socket_id).hasClass( 'border-success') || $('#card_'+socket_id).hasClass( 'border-warning') ){
   if( !on_quiz ){  //. #17
     var correct = $('#card_'+socket_id).hasClass( 'border-success' );
 
@@ -316,10 +330,8 @@ function selectSocket( socket_id ){
       answers[_quiz_id] = {};
     }
     var answer = { point: image_point, correct: !correct };
-    if( image_category == 2 ){
-      answer.point = 17 - image_16_open;  //. #14
-    }else if( image_category == 3 ){
-      answer.point = parseInt( $('#rng').val() ) + 1;
+    if( !correct && points[socket_id] ){
+      answer.point = points[socket_id];  //. #23
     }
     answers[_quiz_id][socket_id] = answer;
 
@@ -362,6 +374,7 @@ function removeCard( card_id ){
 }
 
 function zoomImage( socket_id ){
+  console.log( 'zoomImage: socket_id = ' + socket_id );
   if( socket_id ){
     //console.log( 'zoomImage: socket_id = ' + socket_id );
     $('#box_content').html( '<img id="zoom_image" socket_id="' + socket_id + '" src="' + $('#image_'+socket_id).prop( 'src' ) + '"/>' );
@@ -413,6 +426,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   _quiz_id = quiz_id;
   image_category = quiz_category;
   image_point = quiz_point;
+  current_point = quiz_point;
   if( !answers[quiz_id] ){ answers[quiz_id] = {}; }
 
   $('.card').removeClass( 'border-success' );
@@ -430,9 +444,11 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
         if( result && result.status && result.body ){
           var html = '<h3>' + result.body.body + '</h3>';
           if( result.body.img_url ){
-            if( result.body.category != 2 ){
+            if( result.body.category == 1 ){
+              html += '<div id="demoMap"></div>';
+            }else if( result.body.category == 0 || result.body.category == 3 ){
               html += '<div><img id="q_image" src="' + result.body.img_url + '" height="90%"/></div>';
-            }else{
+            }else if( result.body.category == 2 ){
               html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
             }
           }
@@ -459,6 +475,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
           $('#quiz_div').html( html );
           $('#my-navbar').html('');
           if( result.body.category == 3 ){
+            current_point = 10;
             var e = document.getElementById( 'q_image' );
             var iid = setInterval( function(){
               if( e.complete ){
@@ -468,6 +485,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
               }
             }, 10 );
           }else if( result.body.category == 2 ){
+            current_point = 16;
             image_16_open = 0;
             for( var i = 0; i < 4; i ++ ){
               var tr = '<tr id="board_row_' + i + '">';
@@ -479,6 +497,45 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
               tr += '</tr>';
               $('#open16_table').append( tr );
             }
+          }else if( result.body.category == 1 ){
+            current_point = 10;
+            //. 空の地図を OpenStreetMap データで表示
+            var map = L.map('demoMap', { dragging: true, zoomControl: true, minZoom: 0, maxZoom: 5, crs: L.CRS.Simple, preferCanvas: true } );
+
+            //. 画像パス
+            var imgpath = result.body.img_url;
+            var element = new Image();
+            element.onload = function(){
+              //. 表示する画像のパスとサイズ
+              var image = {
+                url: imgpath,
+                width: element.naturalWidth,
+                height: element.naturalHeight
+              };
+
+              //. 画像領域を地図に設定
+              var imageBounds = L.latLngBounds([
+                map.unproject( [ 0, image.height ] ),
+                map.unproject( [ image.width, 0 ] )
+              ]);
+              map.fitBounds( imageBounds );
+              map.setMaxBounds( imageBounds.pad( 0.5 ) );
+
+              zoomlevel = 5;
+              map.on( 'zoom', function( e ){
+                zoomlevel = map.getZoom();
+                current_point = zoomlevel * 2;
+                console.log( 'zoom : zoomlevel = ' + zoomlevel );
+              });
+              map.setZoom( zoomlevel );
+
+              //. 画像をオーバーレイで設定
+              setTimeout( function(){
+                L.imageOverlay( image.url, imageBounds ).addTo( map );
+                $('#demoMap').css( 'height', image.height + 'px' );
+              }, 100 );
+            }
+            element.src = imgpath;
           }
         }
       },
@@ -490,6 +547,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   }, 200 );
 
   $('#quiz_check_'+quiz_id).attr( 'checked', true ); //. #21
+  points = {};  //. #23
 
   return false;
 }
@@ -539,6 +597,7 @@ function recordAnswers(){
 
 function changeBlur(){
   var b = parseInt( $('#rng').val() );
+  current_point = b + 1;
   $('#range_value').html( ( b + 1 ) );
   var t = $('#q_image')[0];
   t.style['-ms-filter'] = 'blur(' + ( b * blur_ratio ) + 'px)';
@@ -547,12 +606,12 @@ function changeBlur(){
 
 function open16_click( num ){
   var o = $('#panel_'+num).css( 'opacity' );
-  console.log( 'o = ' + o );
   if( o == '1' ){
     $('#panel_'+num).css( 'border-width', '1px' );
     $('#panel_'+num).css( 'opacity', '0' );
 
     image_16_open ++;
+    current_point --;
   }
 }
 
