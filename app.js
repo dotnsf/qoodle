@@ -121,6 +121,7 @@ io.on( 'connection', function( socket ){
     io.to(room).emit( 'init_admin_view', msg );
   });
 
+  /*
   socket.on( 'init_share', function( msg ){
     //console.log( 'init_share', msg );
     msg.socket_id = socket.id;
@@ -128,6 +129,7 @@ io.on( 'connection', function( socket ){
     socket.join( room );
     io.to(room).emit( 'init_share_view', msg );
   });
+  */
 
   socket.on( 'init_client', function( msg ){
     //console.log( 'init_client', msg );
@@ -145,6 +147,7 @@ io.on( 'connection', function( socket ){
     io.to(room).emit( 'image_client_view', msg );
   });
 
+  /*
   socket.on( 'quiz_select', function( msg ){
     //console.log( 'quiz_select', msg );
     msg.socket_id = socket.id;
@@ -172,6 +175,7 @@ io.on( 'connection', function( socket ){
     var room = msg.room ? msg.room : settings.defaultroom;
     io.to(room).emit( 'quiz_fixed_view', msg );
   });
+  */
 
   socket.on( 'quiz_correct', function( msg ){
     //console.log( 'quiz_correct', msg );
@@ -182,6 +186,7 @@ io.on( 'connection', function( socket ){
     io.to(room).emit( 'quiz_correct_view', msg );
   });
 
+  /*
   socket.on( 'show_answers', function( msg ){
     //console.log( 'quiz_fixed', msg );
     msg.socket_id = socket.id;
@@ -216,6 +221,7 @@ io.on( 'connection', function( socket ){
     var room = msg.room ? msg.room : settings.defaultroom;
     io.to(room).emit( 'lock_answer_view', msg );
   });
+  */
 });
 
 

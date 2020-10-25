@@ -105,7 +105,9 @@ html, body{
   <br/>
   <input type="button" class="btn btn-xs" id="undo_btn" value="<" onClick="undo();" disabled="disabled"/>
   <input type="button" class="btn btn-xs btn-warning" id="reset_btn" value="<%= __('common.button.reset') %>" onClick="resetCanvas();"/>
+  <!--
   <input type="button" class="btn btn-xs btn-primary" id="save_btn" value="<%= __('common.button.send') %>" onClick="save();"/>
+  -->
   <input type="button" class="btn btn-xs" id="redo_btn" value=">" onClick="redo();" disabled="disabled"/>
 </div>
 
@@ -159,6 +161,7 @@ $(function(){
 
   init();
 
+  /*
   socketio.on( 'quiz_select_view', function( msg ){
     started = true;
     locked = false;
@@ -193,13 +196,6 @@ $(function(){
     var target_uuid = msg.socket_id;
     if( target_uuid == uuid ){
       console.log( 'quiz_correct_view', msg );
-      /* このタイミングでは画面変更しないで、show_answers_view で画面変更する
-      if( msg.correct ){
-        $('#main').addClass( 'correct' );
-      }else{
-        $('#main').removeClass( 'correct' );
-      }
-      */
     }
   });
 
@@ -216,6 +212,7 @@ $(function(){
     console.log( 'lock_answer_view', msg );
     save();
   });
+  */
 });
 
 function init(){

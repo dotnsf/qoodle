@@ -78,7 +78,7 @@ function reloadQuizsets(){
             //+ '<td><a target="_blank" href="/quizset?id=' + quizset._id + '">' + quizset._id + '</a></td>'
             + '<td><a href="#" onClick="openQuizset(\'' + quizset._id + '\');">' + quizset._id + '</a></td>'
             + '<td>' + quizset.subject + '</td>'
-            + '<td>' + quizset.quiz_ids + '</td>'
+            + '<td>' + forDisplay( '' + quizset.quiz_ids, 50 ) + '</td>'
             + '<td>' + timestamp2datetime( quizset.updated ) + '</td>'
             + '<td><button class="btn btn-xs btn-success" onClick=\'editQuizset(' + JSON.stringify( quizset ) + ');\'>EDIT</button>'
             + '<button class="btn btn-xs btn-danger" onClick=\'delQuizset("' + quizset._id + '");\'>DELETE</button></td>'
@@ -299,6 +299,13 @@ function openQuizset( id ){
   }
 
   window.open( url );
+}
+
+function forDisplay( str, n ){
+  if( !n ){ n = 50; };
+  if( str.length > n ){ str = str.substr( 0, n ) + '...'; }
+
+  return str;
 }
 </script>
 
