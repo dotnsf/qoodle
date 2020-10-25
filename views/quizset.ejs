@@ -130,6 +130,11 @@ html, body{
   </div>
 </div>
 
+<div style="display:none;">
+  <div id="box_content">
+  </div>
+</div>
+
 <script>
 var uuid = generateUUID();
 var socketio = null;
@@ -262,7 +267,7 @@ $(function(){
       cards.push( card );
 
       //. #24（何度も同じ id に対して設定しているのがダメ？）
-      $('#box_content_'+socket_id).colorbox({ inline: true, transition: 'none', width: "90%", height: "90%", onOpen: function(){ zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
+      //$('#box_content_'+socket_id).colorbox({ inline: true, transition: 'none', width: "90%", height: "90%", onOpen: function(){ zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
 
       //. カードグループを必要数だけ追加
       appendCardGroups( '#card-groups', cards.length );
@@ -374,9 +379,8 @@ function removeCard( card_id ){
 }
 
 function zoomImage( socket_id ){
-  console.log( 'zoomImage: socket_id = ' + socket_id );
   if( socket_id ){
-    //console.log( 'zoomImage: socket_id = ' + socket_id );
+    //console.log( ' src = ' + $('#image_'+socket_id).prop( 'src' ) );
     $('#box_content').html( '<img id="zoom_image" socket_id="' + socket_id + '" src="' + $('#image_'+socket_id).prop( 'src' ) + '"/>' );
   }
 }
@@ -398,7 +402,7 @@ function appendCardGroups( cardgroups_selector, num ){
   }
 
   //. クラスでまとめて ColorBox の指定
-  //$('.card').colorbox({ href: '#box_content', inline: true, transition: 'none', width: "90%", innerHeight: "90%", onOpen: function(){ var socket_id = $(this).prop( 'id' ).substr( 5 ); zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
+  $('.card').colorbox({ href: '#box_content', inline: true, transition: 'none', width: "90%", innerHeight: "90%", onOpen: function(){ var socket_id = $(this).prop( 'id' ).substr( 5 ); zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
 
   if( num % m ){
     var row = Math.floor( num / m );
