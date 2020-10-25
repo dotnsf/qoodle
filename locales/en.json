@@ -50,6 +50,8 @@
   "admin.category.1": "Zoomout",
   "admin.category.2": "16 pieces",
   "admin.category.3": "Blur",
+  "admin.category.4": "Sound",
+  "admin.category.5": "Video",
   "admin.tab.quizset.label": "Quizset",
   "admin.tab.quiz.label": "Quiz",
   "admin.quizsettable.column.0": "id",

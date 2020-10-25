@@ -50,6 +50,8 @@
 	"admin.category.1": "ズームアウト",
 	"admin.category.2": "16分割",
 	"admin.category.3": "ぼかし",
+	"admin.category.4": "サウンド",
+	"admin.category.5": "動画",
 	"admin.tab.quizset.label": "クイズセット",
 	"admin.tab.quiz.label": "クイズ",
 	"admin.quizsettable.column.0": "ID",
