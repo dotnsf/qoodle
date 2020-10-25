@@ -6,6 +6,8 @@
 <script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"/>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<link href="//cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css rel="stylesheet"/>
+<script src="//cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 <script src="/cvi_busy_lib.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/qrcode.min.js"></script>
@@ -91,7 +93,7 @@ html, body{
 </div>
 
 <div class="container">
-  <table class="table table-bordered">
+  <table class="table table-bordered" id="quizlist">
     <thead>
       <tr>
         <th>#</th><th><%= __('quizset.list.col1.label') %></th><th><%= __('quizset.list.col2.label') %></th><th><%= __('quizset.list.col3.label') %></th><th><%= __('quizset.list.col5.label') %></th>
@@ -180,6 +182,8 @@ $(function(){
     success: function( result ){
       if( result && result.status && result.body && result.body.quiz_ids ){
         $('#subject').html( result.body.subject );
+        var quiz_cnt = result.body.quiz_ids.length;
+        var cnt = 0;
         for( var i = 0; i < result.body.quiz_ids.length; i ++ ){
           var quiz_id = result.body.quiz_ids[i];
           var tr = '<tr id="quiz_' + quiz_id + '">'
@@ -191,6 +195,13 @@ $(function(){
             + '<td id="quizpoint_' + quiz_id + '"></td>'
             + '</tr>';
           $('#quizlist_tbody').append( tr );
+
+          cnt ++;
+          if( cnt == quiz_cnt ){
+             $('#quizlist').DataTable({
+               language: { url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json" }
+             })
+          }
 
           $.ajax({
             type: 'GET',
