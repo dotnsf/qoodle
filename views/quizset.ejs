@@ -203,28 +203,40 @@ $(function(){
              })
           }
 
+          var cats = ['<%= __("admin.category.0") %>','<%= __("admin.category.1") %>','<%= __("admin.category.2") %>','<%= __("admin.category.3") %>','<%= __("admin.category.4") %>','<%= __("admin.category.5") %>'];
           $.ajax({
             type: 'GET',
             url: '/dbapi/quiz/' + quiz_id,
             success: function( qresult ){
               if( qresult && qresult.status && qresult.body ){
                 //console.log( 'quiz_id = ' + quiz_id + ', _id = ' + qresult.body._id );
-                var cat = ['<%= __("admin.category.0") %>','<%= __("admin.category.1") %>','<%= __("admin.category.2") %>','<%= __("admin.category.3") %>'][qresult.body.category];
+                var cat = cats[qresult.body.category];
                 $('#quizcat_'+qresult.body._id).html( cat );
                 var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + qresult.body._id + '\', ' + qresult.body.category + ', ' + qresult.body.point + ', \'' + qresult.body.comment + '\');">' + qresult.body.body + '</a>';
                 $('#quizbody_'+qresult.body._id).html( a );
                 //$('#quizcomment_'+qresult.body._id).html( qresult.body.comment );
                 $('#quizpoint_'+qresult.body._id).html( qresult.body.point );
                 if( qresult.body.img_url ){
-                  var img = '<img src="' + qresult.body.img_url + '" width="100"/>';
-                  $('#quizimg_'+qresult.body._id).html( img );
+                  if( qresult.body.category < 4 ){
+                    //. 画像
+                    var img = '<img src="' + qresult.body.img_url + '" width="100"/>';
+                    $('#quizimg_'+qresult.body._id).html( img );
 
-                  //. 通常問題以外はそのまま表示したくない・・・
-                  if( qresult.body.category != 0 ){
-                    b = 10;  //. ぼかして表示
-                    var t = $('#quizimg_'+qresult.body._id)[0];
-                    t.style['-ms-filter'] = 'blur(' + b + 'px)';
-                    t.style['filter'] = 'blur(' + b + 'px)';
+                    //. 通常問題以外はそのまま表示したくない・・・
+                    if( qresult.body.category != 0 ){
+                      b = 10;  //. ぼかして表示
+                      var t = $('#quizimg_'+qresult.body._id)[0];
+                      t.style['-ms-filter'] = 'blur(' + b + 'px)';
+                      t.style['filter'] = 'blur(' + b + 'px)';
+                    }
+                  }else if( qresult.body.category == 4 ){
+                    //. サウンド
+                    var img = '<img src="//2.bp.blogspot.com/-I_cufIa0hF8/WxvJ4aLXdkI/AAAAAAABMk0/owKqed9VWX4hw36JShIJW3kyY6IUTV91QCLcBGAs/s180/file_icon_mark_music.png" width="100"/>';
+                    $('#quizimg_'+qresult.body._id).html( img );
+                  }else if( qresult.body.category == 5 ){
+                    //. 動画
+                    var img = '<img src="//3.bp.blogspot.com/-wb-AKkcqcr0/WxvJ5MDTWrI/AAAAAAABMlA/ohMFYIDhi5UJDL3U2Ww40xMAAS0VJHIRgCLcBGAs/s180/file_icon_mark_video.png" width="100"/>';
+                    $('#quizimg_'+qresult.body._id).html( img );
                   }
                 }
               }
@@ -465,6 +477,30 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
               html += '<div><img id="q_image" src="' + result.body.img_url + '" height="90%"/></div>';
             }else if( result.body.category == 2 ){
               html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + result.body.img_url + '\');"></table></div>';
+            }else if( result.body.category == 4 ){
+              html += '<div><audio src="' + result.body.img_url + '" controls></audio></div>';
+            }else if( result.body.category == 5 ){
+              if( result.body.img_url.toLowerCase().endsWith( '.mp4' ) ){
+                html += '<div><video width="560" preloed="true" src="' + result.body.img_url + '" controls></video></div>';
+              }else if( result.body.img_url.toLowerCase().indexOf( 'youtube' ) > -1 ){
+                console.log( 'img_url', result.body.img_url );
+                var tmp1 = result.body.img_url.split( '?' );
+                var v = '';
+                if( tmp1.length > 1 ){
+                  var tmp2 = tmp1[1].split( '&' );
+                  tmp2.forEach( function( tmp3 ){
+                    var tmp4 = tmp3.split( '=' );
+                    if( tmp4.length > 1 && tmp4[0] == 'v' ){
+                      v = tmp4[1];
+                    }
+                  });
+                }
+                if( v ){
+                  html += '<div>'
+                    + '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + v + '" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+                    + '</div>';
+                }
+              }
             }
           }
 

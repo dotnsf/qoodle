@@ -42,7 +42,7 @@ function reloadQuizs(){
     url: '/dbapi/quizs?user_id=' + uuid,
     success: function( result ){
       if( result && result.status ){
-        var categories = [ '<%= __("admin.category.0") %>', '<%= __("admin.category.1") %>', '<%= __("admin.category.2") %>', '<%= __("admin.category.3") %>' ];
+        var categories = [ '<%= __("admin.category.0") %>', '<%= __("admin.category.1") %>', '<%= __("admin.category.2") %>', '<%= __("admin.category.3") %>', '<%= __("admin.category.4") %>', '<%= __("admin.category.5") %>' ];
         result.quizs.forEach( function( quiz ){
           var tr = '<tr>'
             + '<td>' + quiz._id + '</td>'
@@ -402,6 +402,8 @@ html, body{
           <option value="1"><%= __("admin.category.1") %></option>
           <option value="2"><%= __("admin.category.2") %></option>
           <option value="3"><%= __("admin.category.3") %></option>
+          <option value="4"><%= __("admin.category.4") %></option>
+          <option value="5"><%= __("admin.category.5") %></option>
           </select>
           </td>
         </tr>
