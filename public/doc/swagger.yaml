@@ -247,6 +247,10 @@ paths:
           in: path
           description: Quizset ID
           required: true
+        - name: include_docs
+          type: integer
+          in: query
+          description: if 1 then return object includes quiz object
       responses:
         '200':
           description: 成功
