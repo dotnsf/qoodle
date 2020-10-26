@@ -174,7 +174,6 @@ router.get( '/quizs', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_quiz ){
-    //. Cloudant から削除
     db_quiz.list( { include_docs: true }, function( err1, body1, header1 ){
       if( err1 ){
         err1.image_id = "error-1";
@@ -375,9 +374,31 @@ router.get( '/quizset/:id', function( req, res ){
         res.write( JSON.stringify( { status: false, error: err1 } ) );
         res.end();
       }else{
-        var p = JSON.stringify( { status: true, body: body1 }, null, 2 );
-        res.write( p );
-        res.end();
+        var include_docs = req.query.include_docs;
+        if( include_docs && db_quiz ){
+          db_quiz.list( { include_docs: true }, function( err2, body2, header2 ){
+            if( err2 ){
+              var p = JSON.stringify( { status: true, body: body1 }, null, 2 );
+              res.write( p );
+              res.end();
+            }else{
+              body1.quizs = [];
+              body2.rows.forEach( function( quiz ){
+                var _quiz = JSON.parse(JSON.stringify(quiz.doc));
+                if( body1.quiz_ids.indexOf( _quiz._id ) > -1 ){
+                  body1.quizs.push( _quiz );
+                }
+              });
+              var p = JSON.stringify( { status: true, body: body1 }, null, 2 );
+              res.write( p );
+              res.end();
+            }
+          });
+        }else{
+          var p = JSON.stringify( { status: true, body: body1 }, null, 2 );
+          res.write( p );
+          res.end();
+        }
       }
     });
   }else{

@@ -20,6 +20,7 @@
 	"common.button.post": "送信",
 	"common.comment": "コメント",
 	"common.history": "履歴",
+    "quizset.quizlist": "クイズリスト",
 	"quizset.list.col1.label": "カテゴリー",
 	"quizset.list.col2.label": "画像",
 	"quizset.list.col3.label": "問題文",
