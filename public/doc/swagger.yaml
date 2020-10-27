@@ -664,6 +664,12 @@ definitions:
       user_name:
         type: string
         description: ユーザー名
+      login_username:
+        type: string
+        description: ログインユーザー名
+      login_password:
+        type: string
+        description: ログインパスワード
   AnswerRequest:
     type: object
     properties:

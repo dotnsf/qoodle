@@ -330,6 +330,8 @@ router.post( '/quizset', function( req, res ){
     var subject = req.body.subject ? req.body.subject : '';
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
+    var login_username = req.body.login_username ? req.body.login_username : '';
+    var login_password = req.body.login_password ? req.body.login_password : '';
     var params = {
       _id: id,
       type: 'quizset',
@@ -337,6 +339,8 @@ router.post( '/quizset', function( req, res ){
       quiz_ids: quiz_ids,
       user_id: user_id,
       user_name: user_name,
+      login_username: login_username,
+      login_password: login_password,
       crated: ts,
       updated: ts
     };

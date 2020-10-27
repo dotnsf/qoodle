@@ -23,21 +23,15 @@ app.all( '/admin', basicAuth( function( user, pass ){
   }
 }));
 
-app.all( '/quiz', basicAuth( function( user, pass ){
+/* 将来的には quizset 毎に認証をかけたい
+app.all( '/quizset', basicAuth( function( user, pass ){
   if( settings.admin_username && settings.admin_password ){
     return ( settings.admin_username === user && settings.admin_password === pass );
   }else{
     return false;
   }
 }));
-
-app.all( '/classicview', basicAuth( function( user, pass ){
-  if( settings.admin_username && settings.admin_password ){
-    return ( settings.admin_username === user && settings.admin_password === pass );
-  }else{
-    return false;
-  }
-}));
+*/
 
 app.use( multer( { dest: './tmp/' } ).single( 'image' ) );
 app.use( bodyParser.urlencoded( { extended: true } ) );
