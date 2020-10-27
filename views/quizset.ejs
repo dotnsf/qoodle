@@ -272,13 +272,12 @@ $(function(){
         + '<h4 class="card-title"><a id="a_' + socket_id + '" class="my_a btn btn-xs btn-' + color + '" onClick="selectSocket(\'' + socket_id + '\');">&times;</a>' + msg.name + '</h4>'
         + '</div>'
         + '<a href="#box_content" id="box_content_' + socket_id + '" title="' + msg.name + '">'
+        + '<div class="my-card-img" id="xxxx_' + socket_id + '">'   //. #29
         + '<img class="card-img-bottom" id="image_' + socket_id + '" alt="(image of ' + msg.name + ')" ts="' + msg.timestamp + '"/>'
+        + '</div>'
         + '</a>'
         + '</div>';
       cards.push( card );
-
-      //. #24（何度も同じ id に対して設定しているのがダメ？）
-      //$('#box_content_'+socket_id).colorbox({ inline: true, transition: 'none', width: "90%", height: "90%", onOpen: function(){ zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
 
       //. カードグループを必要数だけ追加
       appendCardGroups( '#card-groups', cards.length );
@@ -416,8 +415,8 @@ function appendCardGroups( cardgroups_selector, num ){
     $('#cards-'+row).append( card );
   }
 
-  //. クラスでまとめて ColorBox の指定
-  $('.card').colorbox({ href: '#box_content', inline: true, transition: 'none', width: "90%", innerHeight: "90%", onOpen: function(){ var socket_id = $(this).prop( 'id' ).substr( 5 ); zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
+  //. クラスでまとめて ColorBox の指定 (#29)
+  $('.my-card-img').colorbox({ href: '#box_content', inline: true, transition: 'none', width: "90%", innerHeight: "90%", onOpen: function(){ var socket_id = $(this).prop( 'id' ).substr( 5 ); zoomImage( socket_id ); }, onClosed: function(){ $('#box_content').html(''); } });
 
   if( num % m ){
     var row = Math.floor( num / m );
