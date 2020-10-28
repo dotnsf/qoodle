@@ -45,7 +45,7 @@ function reloadQuizs(){
         var categories = [ '<%= __("admin.category.0") %>', '<%= __("admin.category.1") %>', '<%= __("admin.category.2") %>', '<%= __("admin.category.3") %>', '<%= __("admin.category.4") %>', '<%= __("admin.category.5") %>' ];
         result.quizs.forEach( function( quiz ){
           var tr = '<tr>'
-            + '<td>' + quiz._id + '</td>'
+            + '<td><input type="checkbox" class="quiz_check" id="quiz_check_' + quiz._id + '"/>' + quiz._id + '</td>'
             + '<td>' + categories[quiz.category] + '</td>'
             + '<td>' + quiz.point + '</td>'
             + '<td>' + quiz.body + '</td>'
@@ -329,6 +329,40 @@ function forDisplay( str, n ){
 
   return str;
 }
+
+function createQuizset(){
+  var subject = window.prompt( '<%= __("admin.createquizset.confirm") %>' );
+  if( subject ){
+    var checked_ids = [];
+    $('.quiz_check').each( function( idx, qc ){
+      if( $(qc).prop( 'checked' ) ){
+        var id = $(qc).attr( 'id' );
+        id = id.substr( 11 );
+        checked_ids.push( id );
+      }
+    });
+    if( checked_ids.length > 0 ){
+      var data = {
+        subject: subject,
+        quiz_ids: checked_ids,
+        login_username: '',
+        login_password: '',
+        user_id: uuid,
+        user_name: ''
+      };
+      $.ajax({
+        type: 'POST',
+        url: '/dbapi/quizset',
+        data: data,
+        success: function( result ){
+          location.href = '/admin';
+        },
+        error: function( e0, e1, e2 ){
+        }
+      });
+    }
+  }
+}
 </script>
 
 <style type="text/css">
@@ -406,7 +440,7 @@ html, body{
           <td>&nbsp;</td>
           <td>
             <button class="btn btn-warning" onClick="resetQuizset();"><%= __("admin.quizsettable.resetbutton.label") %></button>
-            <button class="btn btn-success" onClick="saveQuizset();"><%= __("admin.quizsettable.savebutton.label") %></button>
+            <button class="btn btn-primary" onClick="saveQuizset();"><%= __("admin.quizsettable.savebutton.label") %></button>
           </td>
         </tr>
       </table>
@@ -460,7 +494,8 @@ html, body{
           <td>&nbsp;</td>
           <td>
             <button class="btn btn-warning" onClick="resetQuiz();"><%= __("admin.quiztable.resetbutton.label") %></button>
-            <button class="btn btn-success" onClick="saveQuiz();"><%= __("admin.quiztable.savebutton.label") %></button>
+            <button class="btn btn-primary" onClick="saveQuiz();"><%= __("admin.quiztable.savebutton.label") %></button>
+            <button class="btn btn-success" onClick="createQuizset();"><%= __("admin.quiztable.createquizsetbutton.label") %></button>
           </td>
         </tr>
       </table>

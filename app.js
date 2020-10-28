@@ -7,6 +7,7 @@ var express = require( 'express' ),
     bodyParser = require( 'body-parser' ),
     fs = require( 'fs' ),
     ejs = require( 'ejs' ),
+    request = require( 'request' ),
     cloudantlib = require( '@cloudant/cloudant' ),
     uuidv1 = require( 'uuid/v1' ),
     app = express();
@@ -68,12 +69,6 @@ app.use( function( req, res, next ){
         }
       }
     });
-
-    if( db[id] ){
-    }else{
-      res.set( 'WWW-Authenticate', 'Basic realm="401"' );
-      res.status(401).send( 'Authentication required.' );
-    }
   }else{
     return next();
   }
