@@ -139,8 +139,8 @@ function saveQuizset(){
   var data = {
     subject: $('#edit_quizset_subject').val(),
     quiz_ids: JSON.parse( quiz_ids ),
-    login_username: login_username,
-    login_password: login_password,
+    login_username: quizset_login_username,
+    login_password: quizset_login_password,
     user_id: uuid,
     user_name: ''
   };
