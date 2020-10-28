@@ -24,15 +24,6 @@ app.all( '/admin', basicAuth( function( user, pass ){
   }
 }));
 
-/* 将来的には quizset 毎に認証をかけたい
-app.all( '/quizset', basicAuth( function( user, pass ){
-  if( settings.admin_username && settings.admin_password ){
-    return ( settings.admin_username === user && settings.admin_password === pass );
-  }else{
-    return false;
-  }
-}));
-*/
 /* URL パラメータ毎に認証情報を変えたい */
 app.use( function( req, res, next ){
   var originalUrl = req.originalUrl;
@@ -156,16 +147,6 @@ io.on( 'connection', function( socket ){
     io.to(room).emit( 'init_admin_view', msg );
   });
 
-  /*
-  socket.on( 'init_share', function( msg ){
-    //console.log( 'init_share', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    socket.join( room );
-    io.to(room).emit( 'init_share_view', msg );
-  });
-  */
-
   socket.on( 'init_client', function( msg ){
     //console.log( 'init_client', msg );
     msg.socket_id = socket.id;
@@ -182,36 +163,6 @@ io.on( 'connection', function( socket ){
     io.to(room).emit( 'image_client_view', msg );
   });
 
-  /*
-  socket.on( 'quiz_select', function( msg ){
-    //console.log( 'quiz_select', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'quiz_select_view', msg );
-  });
-
-  socket.on( 'quiz_hint', function( msg ){
-    //console.log( 'quiz_hint', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'quiz_hint_view', msg );
-  });
-
-  socket.on( 'quiz_finish', function( msg ){
-    //console.log( 'quiz_finish', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'quiz_finish_view', msg );
-  });
-
-  socket.on( 'quiz_fixed', function( msg ){
-    //console.log( 'quiz_fixed', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'quiz_fixed_view', msg );
-  });
-  */
-
   socket.on( 'quiz_correct', function( msg ){
     //console.log( 'quiz_correct', msg );
     //. 機能的には io.to(target_socket_id).emit() でもいけるが、共有画面にも反映したいので room へ送り、クライアント側で判断する
@@ -220,43 +171,6 @@ io.on( 'connection', function( socket ){
     var room = msg.room ? msg.room : settings.defaultroom;
     io.to(room).emit( 'quiz_correct_view', msg );
   });
-
-  /*
-  socket.on( 'show_answers', function( msg ){
-    //console.log( 'quiz_fixed', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'show_answers_view', msg );
-  });
-
-  socket.on( 'hide_answers', function( msg ){
-    //console.log( 'quiz_fixed', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'hide_answers_view', msg );
-  });
-
-  socket.on( 'show_rank', function( msg ){
-    //console.log( 'quiz_fixed', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'show_rank_view', msg );
-  });
-
-  socket.on( 'hide_rank', function( msg ){
-    //console.log( 'quiz_fixed', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'hide_rank_view', msg );
-  });
-
-  socket.on( 'lock_answer', function( msg ){
-    //console.log( 'quiz_fixed', msg );
-    msg.socket_id = socket.id;
-    var room = msg.room ? msg.room : settings.defaultroom;
-    io.to(room).emit( 'lock_answer_view', msg );
-  });
-  */
 });
 
 

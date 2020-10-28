@@ -16,21 +16,6 @@
 var uuid = generateUUID();
 
 $(function(){
-  /*
-  $.extend( $.fn.dataTable.defaults, {
-    language: {
-      url: '//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Japanese.json'
-    }
-  });
-  $('#image_table').DataTable({
-    columnDefs: [{ 
-      targets: [ 0, 3 ], 
-      orderable: false,
-      searchable: false
-    }],
-    order: [ [ 2, 'desc' ] ]
-  });
-  */
   reloadQuizs();
   reloadQuizsets();
 });
@@ -108,7 +93,9 @@ function saveQuiz(){
     $.ajax({
       type: 'PUT',
       url: '/dbapi/quiz/' + quiz_id,
-      data: data,
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify( data ),
       success: function( result ){
         //location.href = '/admin';
         reloadQuizs();
@@ -144,16 +131,20 @@ function saveQuizset(){
     user_id: uuid,
     user_name: ''
   };
+  console.log( quizset_id, data );
   if( quizset_id ){
     $.ajax({
       type: 'PUT',
       url: '/dbapi/quizset/' + quizset_id,
-      data: data,
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify( data ),
       success: function( result ){
         //location.href = '/admin';
         reloadQuizsets();
       },
       error: function( e0, e1, e2 ){
+        console.log( e0, e1, e2 );
       }
     });
   }else{
@@ -166,6 +157,7 @@ function saveQuizset(){
         reloadQuizsets();
       },
       error: function( e0, e1, e2 ){
+        console.log( e0, e1, e2 );
       }
     });
   }

@@ -460,6 +460,7 @@ router.put( '/quizset/:id', function( req, res ){
     //. Cloudant から更新
     db_quizset.get( id, { include_docs: true }, function( err1, body1, header1 ){
       if( err1 ){
+        console.log( err1 );
         err1.image_id = "error-1";
         res.status( 400 );
         res.write( JSON.stringify( { status: false, error: err1 } ) );
@@ -468,12 +469,20 @@ router.put( '/quizset/:id', function( req, res ){
         var ts = ( new Date() ).getTime();
         var subject = req.body.subject ? req.body.subject : '';
         var quiz_ids = req.body.quiz_ids ? req.body.quiz_ids : [];
+        var quiz_login_username = req.body.login_username ? req.body.login_username : '';
+        var quiz_login_password = req.body.login_password ? req.body.login_password : '';
         if( body1.user_id == req.body.user_id ){
           if( quiz_ids ){
             body1.quiz_ids = quiz_ids;
           }
           if( subject ){
             body1.subject = subject;
+          }
+          if( quiz_login_username ){
+            body1.login_username = quiz_login_username;
+          }
+          if( quiz_login_password ){
+            body1.login_password = quiz_login_password;
           }
           body1.updated = ts;
           db_quizset.insert( body1, function( err, body, header ){
