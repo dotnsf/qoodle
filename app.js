@@ -32,6 +32,52 @@ app.all( '/quizset', basicAuth( function( user, pass ){
   }
 }));
 */
+/* URL パラメータ毎に認証情報を変えたい */
+app.use( function( req, res, next ){
+  var originalUrl = req.originalUrl;
+  if( originalUrl.startsWith( '/quizset' ) ){
+    var id = req.query.id;
+    var option = {
+      url: req.protocol + '://' + req.headers.host + '/dbapi/quizset/' + id,
+      method: 'GET'
+    };
+    request( option, ( err1, res1, body1 ) => {
+      if( err1 ){
+        res.set( 'WWW-Authenticate', 'Basic realm="Qoodle"' );
+        res.status(401).send( 'Authentication required.' );
+      }else{
+        body1 = JSON.parse( body1 );
+        if( body1 && body1.status && body1.body ){
+          var _user = body1.body.login_username;
+          var _pass = body1.body.login_password;
+          if( !_user || !_pass ){
+            return next();
+          }else{
+            var b64auth = ( req.headers.authorization || '' ).split( ' ' )[1] || '';
+            var [ user, pass ] = Buffer.from( b64auth, 'base64' ).toString().split( ':' );
+            if( _user == user && _pass == pass ){
+              return next();
+            }else{
+              res.set( 'WWW-Authenticate', 'Basic realm="Qoodle"' );
+              res.status(401).send( 'Authentication required.' );
+            }
+          }
+        }else{
+          res.set( 'WWW-Authenticate', 'Basic realm="Qoodle"' );
+          res.status(401).send( 'Authentication required.' );
+        }
+      }
+    });
+
+    if( db[id] ){
+    }else{
+      res.set( 'WWW-Authenticate', 'Basic realm="401"' );
+      res.status(401).send( 'Authentication required.' );
+    }
+  }else{
+    return next();
+  }
+});
 
 app.use( multer( { dest: './tmp/' } ).single( 'image' ) );
 app.use( bodyParser.urlencoded( { extended: true } ) );

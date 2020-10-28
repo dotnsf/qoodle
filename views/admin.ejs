@@ -134,9 +134,13 @@ function saveQuiz(){
 function saveQuizset(){
   var quizset_id = $('#edit_quizset_id').val();
   var quiz_ids = $('#edit_quizset_ids').val();
+  var quizset_login_username = $('#edit_quizset_login_username').val();
+  var quizset_login_password = $('#edit_quizset_login_password').val();
   var data = {
     subject: $('#edit_quizset_subject').val(),
     quiz_ids: JSON.parse( quiz_ids ),
+    login_username: login_username,
+    login_password: login_password,
     user_id: uuid,
     user_name: ''
   };
@@ -253,6 +257,8 @@ function editQuizset( quizset ){
     $('#edit_quizset_id').val( '' );
   }
   $('#edit_quizset_subject').val( quizset.subject );
+  $('#edit_quizset_login_username').val( quizset.login_username );
+  $('#edit_quizset_login_password').val( quizset.login_password );
   $('#edit_quizset_ids').val( JSON.stringify( quizset.quiz_ids, null , 2 ) );
 }
 
@@ -299,6 +305,22 @@ function openQuizset( id ){
   }
 
   window.open( url );
+}
+
+function resetQuiz(){
+  $('#edit_quiz_id').val('');
+  $('#edit_quiz_point').val('');
+  $('#edit_quiz_body').val('');
+  $('#edit_quiz_comment').val('');
+  $('#edit_quiz_img_url').val('');
+}
+
+function resetQuizset(){
+  $('#edit_quizset_id').val('');
+  $('#edit_quizset_subject').val('');
+  $('#edit_quizset_login_username').val('');
+  $('#edit_quizset_login_password').val('');
+  $('#edit_quizset_ids').val('[]');
 }
 
 function forDisplay( str, n ){
@@ -350,7 +372,7 @@ html, body{
     <div id="tab-pane-quizset" class="tab-pane active">
       <table class="table table-bordered list-table">
         <thead id="quizset_table_heat">
-          <tr><th># <input type="text" id="room" value="" placeholder="room"/> </th><th><%= __("admin.quizsettable.column.1") %></th><th><%= __("admin.quizsettable.column.2") %></th><th><%= __("admin.quizsettable.column.3") %></th><th><%= __("admin.quizsettable.column.4") %></th></tr>
+          <tr><th># <input type="text" id="room" value="" placeholder="room"/> </th><th><%= __("admin.quizsettable.column.1") %></th><th><%= __("admin.quizsettable.column.2") %></th><th><%= __("admin.quizsettable.column.3") %></th><th><%= __("admin.quizsettable.column.6") %></th></tr>
         </thead>
         <tbody id="quizset_table_body">
         </tbody>
@@ -367,6 +389,14 @@ html, body{
           <td><input type="text" class="form-control" id="edit_quizset_subject" value=""/></td>
         </tr>
         <tr>
+          <td><%= __("admin.quizsettable.column.4") %></td>
+          <td><input type="text" class="form-control" id="edit_quizset_login_username" value=""/></td>
+        </tr>
+        <tr>
+          <td><%= __("admin.quizsettable.column.5") %></td>
+          <td><input type="password" class="form-control" id="edit_quizset_login_password" value=""/></td>
+        </tr>
+        <tr>
           <td><%= __("admin.quizsettable.column.2") %></td>
           <td>
             <textarea class="form-control" rows="5" id="edit_quizset_ids" placeholder='[&#13;  "xxx",&#13;  "yyy"&#13;]'></textarea>
@@ -374,7 +404,10 @@ html, body{
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><button class="btn btn-success" onClick="saveQuizset();"><%= __("admin.quizsettable.savebutton.label") %></button></td>
+          <td>
+            <button class="btn btn-warning" onClick="resetQuizset();"><%= __("admin.quizsettable.resetbutton.label") %></button>
+            <button class="btn btn-success" onClick="saveQuizset();"><%= __("admin.quizsettable.savebutton.label") %></button>
+          </td>
         </tr>
       </table>
       </div>
@@ -425,7 +458,10 @@ html, body{
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><button class="btn btn-success" onClick="saveQuiz();"><%= __("admin.quiztable.savebutton.label") %></button></td>
+          <td>
+            <button class="btn btn-warning" onClick="resetQuiz();"><%= __("admin.quiztable.resetbutton.label") %></button>
+            <button class="btn btn-success" onClick="saveQuiz();"><%= __("admin.quiztable.savebutton.label") %></button>
+          </td>
         </tr>
       </table>
       </div>
