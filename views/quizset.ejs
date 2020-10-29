@@ -279,7 +279,7 @@ $(function(){
 
   socketio.on( 'image_client_view', function( msg ){
     var socket_id = msg.uuid; //msg.socket_id;
-    if( socket_ids.indexOf( socket_id ) > -1 ){
+    if( on_quiz && socket_ids.indexOf( socket_id ) > -1 ){  //. #34
       var ts = $('#image_'+socket_id).attr( 'ts' );
       ts = parseInt( ts );
 
