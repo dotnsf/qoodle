@@ -165,7 +165,6 @@ var on_quiz = false;  //. #17
 var answers = {};
 var names = {};
 
-//var map = null;  //. #22
 var zoomlevel = 0;  //. #22
 
 var points = {};  //. #23
@@ -220,15 +219,6 @@ $(function(){
             t.style['-ms-filter'] = 'blur(' + b + 'px)';
             t.style['filter'] = 'blur(' + b + 'px)';
           }
-
-          /*
-          cnt ++;
-          if( cnt == quiz_cnt ){
-             $('#quizlist').DataTable({
-               language: { url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json" }
-             })
-          }
-          */
         }
 
         $('#quizlist').DataTable({
@@ -355,7 +345,7 @@ function selectSocket( socket_id ){
     answers[_quiz_id][socket_id] = answer;
 
     //. このタイミングでDBに記録する
-    //recordAnswer( socket_id, answer );  //. 更新の可能性がある
+    saveAnswer( socket_id, answer );
 
     //. このタイミングでランキング表を更新する
     updateRanking();
@@ -394,7 +384,6 @@ function removeCard( card_id ){
 
 function zoomImage( socket_id ){
   if( socket_id ){
-    //console.log( ' src = ' + $('#image_'+socket_id).prop( 'src' ) );
     $('#box_content').html( '<img id="zoom_image" socket_id="' + socket_id + '" src="' + $('#image_'+socket_id).prop( 'src' ) + '"/>' );
   }
 }
@@ -429,7 +418,6 @@ function appendCardGroups( cardgroups_selector, num ){
   //. 画像再描画
   Object.keys( imgs ).forEach( function( socket_id ){
     var img = imgs[socket_id];
-    //console.log( 'appendCardGroups: socket_id = ' + socket_id, img );
 
     $('#image_'+socket_id).prop( 'src', img.src );
     $('#image_'+socket_id).prop( 'title', img.title );
@@ -438,7 +426,6 @@ function appendCardGroups( cardgroups_selector, num ){
 }
 
 function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
-  console.log( 'selectQuiz: quiz_id = ' + quiz_id );
   on_quiz = true;
   activeTab( 'tab-pane-quiz' );
   _quiz_id = quiz_id;
@@ -474,7 +461,6 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
               if( result.body.img_url.toLowerCase().endsWith( '.mp4' ) ){
                 html += '<div><video width="560" preloed="true" src="' + result.body.img_url + '" controls></video></div>';
               }else if( result.body.img_url.toLowerCase().indexOf( 'youtube' ) > -1 ){
-                console.log( 'img_url', result.body.img_url );
                 var tmp1 = result.body.img_url.split( '?' );
                 var v = '';
                 if( tmp1.length > 1 ){
@@ -567,7 +553,6 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
               map.on( 'zoom', function( e ){
                 zoomlevel = map.getZoom();
                 current_point = zoomlevel * 2;
-                console.log( 'zoom : zoomlevel = ' + zoomlevel );
               });
               map.setZoom( zoomlevel );
 
@@ -597,20 +582,6 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
 function quizFinish(){
   on_quiz = false;
 
-  /*
-  $('#card_'+target_uuid).removeClass( 'border-secondary' );
-  $('#card_'+target_uuid).removeClass( 'border-success' );
-  $('#a_'+target_uuid).removeClass( 'btn-secondary' );
-  $('#a_'+target_uuid).removeClass( 'btn-success' );
-  $('#card_'+target_uuid).addClass( 'border-warning' );
-  $('#a_'+target_uuid).addClass( 'btn-warning' );
-  $('.card').removeClass( 'border-secondary' );
-  $('.card').removeClass( 'border-success' );
-  $('.card').removeClass( 'border-warning' );
-  $('.my_a').removeClass( 'btn-secondary' );
-  $('.my_a').removeClass( 'btn-warning' );
-  $('.my_a').removeClass( 'btn-success' );
-  */
   $('#quiz_answer').css( 'display', 'inline' );
   $('#quizFinishBtn').css( 'display', 'none' );
 }
@@ -670,9 +641,29 @@ function disableTab( tabid ){
   $('.nav-tabs a[href="#' + tabid + '"]').removeAttr( 'data-toggle' );
 }
 
-function recordAnswer( uuid, answer ){
-  console.log( 'recordAnswer()', uuid, answer );
+var ids_by_quiz_id = {};
+function saveAnswer( uuid, answer ){
+  var quizset_id = '<%= id %>';
 
+  //. データがなかったら作成、あったら更新
+  var isNew = true;
+  if( ids_by_quiz_id[_quiz_id] ){
+    if( ids_by_quiz_id[_quiz_id][uuid] ){
+      isNew = false;
+    }
+  }else{
+    ids_by_quiz_id[_quiz_id] = {};
+  }
+
+  if( isNew ){
+    recordAnswer( uuid, answer );
+  }else{
+    var _id = ids_by_quiz_id[_quiz_id][uuid];
+    updateAnswer( _id, uuid, answer );
+  }
+}
+
+function recordAnswer( uuid, answer ){
   var data = {
     quizset_id: '<%= id %>',
     quiz_id: _quiz_id,
@@ -685,20 +676,41 @@ function recordAnswer( uuid, answer ){
     url: '/dbapi/answer',
     data: data,
     success: function( result ){
-      obj.remove();
       if( result && result.status && result.body ){
+        ids_by_quiz_id[_quiz_id][uuid] = result.body.id;
       }
     },
     error: function( e0, e1, e2 ){
-      obj.remove();
+      console.log( e0, e1, e2 );
+    }
+  });
+}
+function updateAnswer( _id, uuid, answer ){
+  var data = {
+    quizset_id: '<%= id %>',
+    quiz_id: _quiz_id,
+    point: ( answer.correct ? answer.point : 0 ),
+    user_id: uuid,
+    user_name: uuid
+  };
+  $.ajax({
+    type: 'PUT',
+    url: '/dbapi/answer/' + _id,
+    contentType: 'application/json',
+    dataType: 'json',
+    data: JSON.stringify( data ),
+    success: function( result ){
+      if( result && result.status && result.body ){
+        ids_by_quiz_id[_quiz_id][uuid] = result.body.id;
+      }
+    },
+    error: function( e0, e1, e2 ){
       console.log( e0, e1, e2 );
     }
   });
 }
 
 function updateRanking(){
-  console.log( 'updateRanking()' );
-
   //. 全参加者 ID と全問題 ID を確認
   var uuids = [];
   var quizs = [];

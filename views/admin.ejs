@@ -101,6 +101,7 @@ function saveQuiz(){
         reloadQuizs();
       },
       error: function( e0, e1, e2 ){
+        console.log( e0, e1, e2 );
       }
     });
   }else{
@@ -178,25 +179,6 @@ function previewQuiz( quiz ){
       html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + quiz.img_url + '\');"></table></div>';
     }
   }
-
-  /*
-  switch( result.body.category ){
-  case 0:
-    //. 一般クイズ
-    break;
-  case 1:
-    //. フリーテキスト出題
-    break;
-  case 2:
-    //. 16分割クイズ
-    break;
-  case 3:
-    //. ぼかしクイズ
-    html += '<br/>'
-      + '<input id="rng" type="range" value="9" min="0" max="9" step="1" onInput="changeBlur();"/> <span id="range_value">10</span>';
-    break;
-  }
-  */
 
   $('#preview-main').html( html );
 

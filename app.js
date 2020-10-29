@@ -24,7 +24,7 @@ app.all( '/admin', basicAuth( function( user, pass ){
   }
 }));
 
-/* URL パラメータ毎に認証情報を変えたい */
+//. URL パラメータ毎に認証情報を変えたい
 app.use( function( req, res, next ){
   var originalUrl = req.originalUrl;
   if( originalUrl.startsWith( '/quizset' ) ){
@@ -163,14 +163,13 @@ io.on( 'connection', function( socket ){
     io.to(room).emit( 'image_client_view', msg );
   });
 
+  /*
   socket.on( 'quiz_correct', function( msg ){
     //console.log( 'quiz_correct', msg );
-    //. 機能的には io.to(target_socket_id).emit() でもいけるが、共有画面にも反映したいので room へ送り、クライアント側で判断する
-    //var target_socket_id = msg.target_socket_id;
-    //msg.socket_id = socket.id;
     var room = msg.room ? msg.room : settings.defaultroom;
     io.to(room).emit( 'quiz_correct_view', msg );
   });
+  */
 });
 
 

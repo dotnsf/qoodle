@@ -653,6 +653,9 @@ router.post( '/answer', function( req, res ){
     var point = req.body.point ? req.body.point : 0;
     var user_id = req.body.user_id ? req.body.user_id : '';
     var user_name = req.body.user_name ? req.body.user_name : '';
+    if( typeof point == 'string' ){
+      point = parseInt( point );
+    }
     var params = {
       _id: id,
       type: 'answer',
@@ -777,6 +780,9 @@ router.put( '/answer/:id', function( req, res ){
         var quizset_id = req.body.quizset_id ? req.body.quizset_id : '';
         var point = req.body.point ? req.body.point : 0;
         var user_id = req.body.user_id ? req.body.user_id : '';
+        if( typeof point == 'string' ){
+          point = parseInt( point );
+        }
         if( body1.user_id == user_id ){
           if( quiz_id ){
             body1.quiz_id = quiz_id;
@@ -784,9 +790,7 @@ router.put( '/answer/:id', function( req, res ){
           if( quizset_id ){
             body1.quizset_id = quizset_id;
           }
-          if( point ){
-            body1.point = point;
-          }
+          body1.point = point;
           body1.updated = ts;
           db_answer.insert( body1, function( err, body, header ){
             if( err ){
