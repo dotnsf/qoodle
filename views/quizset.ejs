@@ -160,7 +160,7 @@ var image_16_open = 0;
 var _quiz_id = null;
 var _quiz_comment = '';
 
-var on_quiz = false;  //. #17
+var on_quiz = true;  //. #17  //. 最初は自由に描けるようにする
 
 var answers = {};
 var names = {};
@@ -440,6 +440,9 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   $('#quiz_answer').css( 'display', 'none' );
   $('#quiz_answer').html( quiz_comment );
   $('#quizFinishBtn').css( 'display', 'inline' );
+
+  //. 問題を選択したらクイズリストを閉じる
+  $('#subject').click();
 
   setTimeout( function(){
     $.ajax({
