@@ -4,6 +4,7 @@ var express = require( 'express' ),
     basicAuth = require( 'basic-auth-connect' ),
     bodyParser = require( 'body-parser' ),
     cloudantlib = require( '@cloudant/cloudant' ),
+    crypto = require( 'crypto' ),
     fs = require( 'fs' ),
     ejs = require( 'ejs' ),
     i18n = require( 'i18n' ),
@@ -332,6 +333,12 @@ router.post( '/quizset', function( req, res ){
     var user_name = req.body.user_name ? req.body.user_name : '';
     var login_username = req.body.login_username ? req.body.login_username : '';
     var login_password = req.body.login_password ? req.body.login_password : '';
+
+    //. #41
+    var hash = crypto.createHash( 'sha512' );
+    hash.update( login_password );
+    var hash_password = hash.digest( 'hex' );
+
     var params = {
       _id: id,
       type: 'quizset',
@@ -340,7 +347,7 @@ router.post( '/quizset', function( req, res ){
       user_id: user_id,
       user_name: user_name,
       login_username: login_username,
-      login_password: login_password,
+      login_password: hash_password,
       crated: ts,
       updated: ts
     };
@@ -431,14 +438,16 @@ router.get( '/quizsets', function( req, res ){
           if( quizset_id ){
             body1.rows.forEach( function( quizset ){
               var _quizset = JSON.parse(JSON.stringify(quizset.doc));
-              if( _quizset.quizset_id == quizset_id ){
+              if( _quizset.user_id == user_id && _quizset.quizset_id == quizset_id ){
                 quizsets.push( _quizset );
               }
             });
           }else{
             body1.rows.forEach( function( quizset ){
               var _quizset = JSON.parse(JSON.stringify(quizset.doc));
-              quizsets.push( _quizset );
+              if( _quizset.user_id == user_id ){
+                quizsets.push( _quizset );
+              }
             });
           }
           var p = JSON.stringify( { status: true, quizsets: quizsets }, null, 2 );
@@ -489,7 +498,11 @@ router.put( '/quizset/:id', function( req, res ){
             body1.login_username = quiz_login_username;
           }
           if( quiz_login_password ){
-            body1.login_password = quiz_login_password;
+            //. #41
+            var hash = crypto.createHash( 'sha512' );
+            hash.update( quiz_login_password );
+            var hash_password = hash.digest( 'hex' );
+            body1.login_password = hash_password;
           }
           body1.updated = ts;
           db_quizset.insert( body1, function( err, body, header ){

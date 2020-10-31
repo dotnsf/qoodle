@@ -2,6 +2,7 @@
 
 var express = require( 'express' ),
     basicAuth = require( 'basic-auth-connect' ),
+    crypto = require( 'crypto' ),
     i18n = require( 'i18n' ),
     multer = require( 'multer' ),
     bodyParser = require( 'body-parser' ),
@@ -47,7 +48,13 @@ app.use( function( req, res, next ){
           }else{
             var b64auth = ( req.headers.authorization || '' ).split( ' ' )[1] || '';
             var [ user, pass ] = Buffer.from( b64auth, 'base64' ).toString().split( ':' );
-            if( _user == user && _pass == pass ){
+
+            //. #41
+            var hash = crypto.createHash( 'sha512' );
+            hash.update( pass );
+            var hash_pass = hash.digest( 'hex' );
+
+            if( _user == user && _pass == hash_pass ){
               return next();
             }else{
               res.set( 'WWW-Authenticate', 'Basic realm="Qoodle"' );
