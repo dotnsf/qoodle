@@ -190,6 +190,11 @@ paths:
           type: string
           in: query
           description: user id
+          required: true
+        - name: quizset_id
+          type: string
+          in: query
+          description: quizset id
         - name: limit
           type: integer
           in: query

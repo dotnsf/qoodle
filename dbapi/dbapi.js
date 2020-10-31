@@ -416,34 +416,41 @@ router.get( '/quizsets', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
 
   if( db_quizset ){
-    //. Cloudant から削除
-    db_quizset.list( { include_docs: true }, function( err1, body1, header1 ){
-      if( err1 ){
-        err1.image_id = "error-1";
-        res.status( 400 );
-        res.write( JSON.stringify( { status: false, error: err1 } ) );
-        res.end();
-      }else{
-        var quizsets = [];
-        var user_id = req.query.user_id;
-        if( user_id ){
-          body1.rows.forEach( function( quizset ){
-            var _quizset = JSON.parse(JSON.stringify(quizset.doc));
-            if( _quizset.user_id == user_id ){
-              quizsets.push( _quizset );
-            }
-          });
+    var user_id = req.query.user_id;
+    if( user_id ){
+      //. Cloudant から取得
+      db_quizset.list( { include_docs: true }, function( err1, body1, header1 ){
+        if( err1 ){
+          err1.image_id = "error-1";
+          res.status( 400 );
+          res.write( JSON.stringify( { status: false, error: err1 } ) );
+          res.end();
         }else{
-          body1.rows.forEach( function( quizset ){
-            var _quizset = JSON.parse(JSON.stringify(quizset.doc));
-            quizsets.push( _quizset );
-          });
+          var quizsets = [];
+          var quizset_id = req.query.quizset_id;
+          if( quizset_id ){
+            body1.rows.forEach( function( quizset ){
+              var _quizset = JSON.parse(JSON.stringify(quizset.doc));
+              if( _quizset.quizset_id == quizset_id ){
+                quizsets.push( _quizset );
+              }
+            });
+          }else{
+            body1.rows.forEach( function( quizset ){
+              var _quizset = JSON.parse(JSON.stringify(quizset.doc));
+              quizsets.push( _quizset );
+            });
+          }
+          var p = JSON.stringify( { status: true, quizsets: quizsets }, null, 2 );
+          res.write( p );
+          res.end();
         }
-        var p = JSON.stringify( { status: true, quizsets: quizsets }, null, 2 );
-        res.write( p );
-        res.end();
-      }
-    });
+      });
+    }else{
+      res.status( 400 );
+      res.write( JSON.stringify( { status: false, error: 'parameter user_id required.' } ) );
+      res.end();
+    }
   }else{
     res.status( 400 );
     res.write( JSON.stringify( { status: false, error: 'db is not initialized.' } ) );
