@@ -54,7 +54,7 @@ app.all( '/admin', basicAuth( function( user, pass ){
   if( settings.admin_username && settings.admin_password ){
     return ( settings.admin_username === user && settings.admin_password === pass );
   }else{
-    return false;
+    return true;
   }
 }));
 
@@ -177,28 +177,13 @@ app.get( '/draw', function( req, res ){
 app.get( '/quizset', function( req, res ){
   var id = req.query.id;
   var room = req.query.room;
-  if( !room ){ room = settings.defaultroom; }
-  var columns = req.query.columns;
-  if( columns ){
-    columns = parseInt( columns );
+  if( !room ){ 
+    room = ( new Date().getTime().toString(16) ) + Math.floor( 1000 * Math.random() ).toString(16);
+    res.redirect( '/quizset?id=' + id + '&room=' + room );
   }else{
-    columns = settings.defaultcolumns;
+    res.render( 'quizset', { id: id, room: room } );
   }
-  res.render( 'quizset', { id: id, room: room, columns: columns } );
 });
-
-app.get( '/share', function( req, res ){
-  var room = req.query.room;
-  if( !room ){ room = settings.defaultroom; }
-  var columns = req.query.columns;
-  if( columns ){
-    columns = parseInt( columns );
-  }else{
-    columns = settings.defaultcolumns;
-  }
-  res.render( 'share', { room: room, columns: columns } );
-});
-
 
 app.post( '/setcookie', function( req, res ){
   res.contentType( 'application/json; charset=utf-8' );
