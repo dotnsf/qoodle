@@ -8,14 +8,47 @@ var express = require( 'express' ),
     bodyParser = require( 'body-parser' ),
     fs = require( 'fs' ),
     ejs = require( 'ejs' ),
+    passport = require( 'passport' ),
     request = require( 'request' ),
+    session = require( 'express-session' ),
     cloudantlib = require( '@cloudant/cloudant' ),
+    WebAppStrategy = require( 'ibmcloud-appid' ).WebAppStrategy,
     uuidv1 = require( 'uuid/v1' ),
     app = express();
 var http = require( 'http' ).createServer( app );
 var io = require( 'socket.io' ).listen( http );
 
 var settings = require( './settings' );
+
+//. setup session
+app.use( session({
+  secret: 'qoodle',
+  resave: false,
+  saveUninitialized: false
+}));
+
+//. setup passport
+app.use( passport.initialize() );
+app.use( passport.session() );
+passport.serializeUser( ( user, cb ) => cb( null, user ) );
+passport.deserializeUser( ( user, cb ) => cb( null, user ) );
+passport.use( new WebAppStrategy({
+  tenantId: settings.tenantId,
+  clientId: settings.clientId,
+  secret: settings.secret,
+  oauthServerUrl: settings.oauthServerUrl,
+  redirectUri: settings.redirectUri
+}));
+
+//. #35
+var access_token = null;
+settings.getAccessToken().then( function( token ){
+  if( token ){
+    access_token = token;
+  }
+}).catch( function( err ){
+  console.log( err );
+});
 
 app.all( '/admin', basicAuth( function( user, pass ){
   if( settings.admin_username && settings.admin_password ){
@@ -90,6 +123,43 @@ app.use( i18n.init );
 
 var dbapi = require( './dbapi/dbapi' );
 app.use( '/dbapi', dbapi );
+
+
+//. login
+app.get( '/appid/login', passport.authenticate( WebAppStrategy.STRATEGY_NAME, {
+  successRedirect: '/admin',
+  forceLogin: false //true
+}));
+
+//. callback
+app.get( '/appid/callback', function( req, res, next ){
+  next();
+}, passport.authenticate( WebAppStrategy.STRATEGY_NAME )
+);
+
+//. logout
+app.get( '/appid/logout', function( req, res ){
+  WebAppStrategy.logout( req );
+  res.redirect( '/admin' );
+});
+
+//. get user info
+app.get( '/appid/user', async function( req, res ){
+  if( !req.user ){
+    res.status( 401 );
+    res.send( '' );
+  }else{
+    var profile = await getProfile( req.user.sub );
+    res.json({
+      user: {
+        id: req.user.sub,
+        name: req.user.name,
+        email: req.user.email,
+        attributes: profile.attributes
+      }
+    });
+  }
+});
 
 
 app.get( '/admin', function( req, res ){
@@ -195,6 +265,61 @@ function timestamp2datetime( ts ){
   }else{
     return "";
   }
+}
+
+async function getProfile( userId ){
+  return new Promise( async ( resolve, reject ) => {
+    if( access_token ){
+      var headers1 = {
+        accept: 'application/json',
+        authorization: 'Bearer ' + access_token
+      };
+      var option1 = {
+        url: 'https://' + settings.region + '.appid.cloud.ibm.com/management/v4/' + settings.tenantId + '/users/' + userId + '/profile',
+        method: 'GET',
+        headers: headers1
+      };
+      request( option1, ( err1, res1, body1 ) => {
+        if( err1 ){
+          console.log( 'err1', err1 );
+          reject( err1 );
+        }else{
+          var profile = JSON.parse( body1 );
+          console.log( JSON.stringify( profile, null, 2 ) );
+          resolve( { status: true, profile: profile } );
+
+          /*
+          var headers2 = {
+            accept: 'application/json',
+            authorization: 'Bearer ' + access_token
+          };
+          var option2 = {
+            url: 'https://' + region + '.appid.cloud.ibm.com/management/v4/' + tenantId + '/users/' + userId + '/roles',
+            method: 'GET',
+            headers: headers2
+          };
+          request( option2, ( err2, res2, body2 ) => {
+            if( err2 ){
+              console.log( 'err2', err2 );
+              reject( err2 );
+            }else{
+              //. this means no error
+              body2 = JSON.parse( body2 );
+              var roles = body2.roles;
+
+              //. カスタム属性
+              //. https://qiita.com/yo24/items/7b577891d67cec52d9b2
+
+              //console.log( profile, roles );
+              console.log( JSON.stringify( profile, null, 2 ) );
+              resolve( { status: true, profile: profile, roles: roles } );
+            }
+          });
+          */
+        }
+      });
+    }
+  });
 }
 
 

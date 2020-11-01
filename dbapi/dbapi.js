@@ -54,6 +54,22 @@ if( settings.db_username && settings.db_password ){
         }
       }else{
         db_quizset = cloudant.db.use( settings.db_name_quizset );
+
+        //. #38
+        var ts = ( new Date() ).getTime();
+        var params = {
+          _id: 'test',
+          type: 'quizset',
+          subject: 'test',
+          quiz_ids: [],
+          user_id: 'qoodle@teyan.de',
+          user_name: 'Qoodle',
+          login_username: '',
+          login_password: '',
+          crated: ts,
+          updated: ts
+        };
+        db_quizset.insert( params, function( err, body, header ){});
       }
     });
     cloudant.db.get( settings.db_name_answer, function( err, body ){

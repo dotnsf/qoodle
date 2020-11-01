@@ -13,11 +13,35 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 
 <script>
-var uuid = generateUUID();
+var uuid = null; //generateUUID();
+var user = null;
+var attributes_quiznum = 5;
+var attributes_quizsetnum = 1;
+var result_quiznum = 0;
+var result_quizsetnum = 0;
 
 $(function(){
-  reloadQuizs();
-  reloadQuizsets();
+  $.ajax({
+    type: 'GET',
+    url: '/appid/user',
+    success: function( result ){
+      user = result.user;
+      uuid = result.user.email;
+      if( result.user.attributes && result.user.attributes.quiz ){
+        attributes_quiznum = result.user.attributes.quiz;
+      }
+      if( result.user.attributes && result.user.attributes.quizset ){
+        attributes_quizsetnum = result.user.attributes.quizset;
+      }
+      $('#navitem').html( '<a class="nav-link" href="/appid/logout">' + user.name + '</a>' );
+
+      reloadQuizs();
+      reloadQuizsets();
+    },
+    error: function( e0, e1, e2 ){
+      $('#navitem').html( '<a class="nav-link" href="/appid/login"><%= __("admin.login") %></a>' );
+    }
+  });
 });
 
 function reloadQuizs(){
@@ -28,7 +52,10 @@ function reloadQuizs(){
     success: function( result ){
       if( result && result.status ){
         var categories = [ '<%= __("admin.category.0") %>', '<%= __("admin.category.1") %>', '<%= __("admin.category.2") %>', '<%= __("admin.category.3") %>', '<%= __("admin.category.4") %>', '<%= __("admin.category.5") %>' ];
-        result.quizs.forEach( function( quiz ){
+        result_quiznum = result.quizs.length;
+        var n = ( attributes_quiznum == -1 ? result.quizs.length : ( attributes_quiznum < result.quizs.length ? attributes_quiznum : result.quizs.length ) );
+        for( var i = 0; i < n; i ++ ){
+          var quiz = result.quizs[i];
           var tr = '<tr>'
             + '<td><input type="checkbox" class="quiz_check" id="quiz_check_' + quiz._id + '"/>' + quiz._id + '</td>'
             + '<td>' + categories[quiz.category] + '</td>'
@@ -42,7 +69,7 @@ function reloadQuizs(){
             + '<button class="btn btn-xs btn-danger" onClick=\'delQuiz(\"' + quiz._id + '\");\'>DELETE</button></td>'
             + '</tr>';
           $('#quiz_table_body').append( tr );
-        });
+        }
       }
     },
     error: function( err ){
@@ -58,7 +85,10 @@ function reloadQuizsets(){
     url: '/dbapi/quizsets?user_id=' + uuid,
     success: function( result ){
       if( result && result.status ){
-        result.quizsets.forEach( function( quizset ){
+        result_quizsetnum = result.quizsets.length;
+        var n = ( attributes_quizsetnum == -1 ? result.quizsets.length : ( attributes_quizsetnum < result.quizsets.length ? attributes_quizsetnum : result.quizsets.length ) );
+        for( var i = 0; i < n; i ++ ){
+          var quizset = result.quizsets[i];
           var tr = '<tr>'
             //+ '<td><a target="_blank" href="/quizset?id=' + quizset._id + '">' + quizset._id + '</a></td>'
             + '<td><a href="#" onClick="openQuizset(\'' + quizset._id + '\');">' + quizset._id + '</a></td>'
@@ -69,7 +99,7 @@ function reloadQuizsets(){
             + '<button class="btn btn-xs btn-danger" onClick=\'delQuizset("' + quizset._id + '");\'>DELETE</button></td>'
             + '</tr>';
           $('#quizset_table_body').append( tr );
-        });
+        }
       }
     },
     error: function( err ){
@@ -87,35 +117,43 @@ function saveQuiz(){
     comment: $('#edit_quiz_comment').val(),
     img_url: $('#edit_quiz_img_url').val(),
     user_id: uuid,
-    user_name: ''
+    user_name: user.name
   };
   if( quiz_id ){
-    $.ajax({
-      type: 'PUT',
-      url: '/dbapi/quiz/' + quiz_id,
-      contentType: 'application/json',
-      dataType: 'json',
-      data: JSON.stringify( data ),
-      success: function( result ){
-        //location.href = '/admin';
-        reloadQuizs();
-      },
-      error: function( e0, e1, e2 ){
-        console.log( e0, e1, e2 );
-      }
-    });
+    if( attributes_quiznum == -1 || result_quiznum <= attributes_quiznum ){
+      $.ajax({
+        type: 'PUT',
+        url: '/dbapi/quiz/' + quiz_id,
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify( data ),
+        success: function( result ){
+          //location.href = '/admin';
+          reloadQuizs();
+        },
+        error: function( e0, e1, e2 ){
+          console.log( e0, e1, e2 );
+        }
+      });
+    }else{
+      alert( '<%= __("admin.overquiznum.0") %> ' + attributes_quiznum + '<%= __("admin.overquiznum.1") %>' );
+    }
   }else{
-    $.ajax({
-      type: 'POST',
-      url: '/dbapi/quiz',
-      data: data,
-      success: function( result ){
-        //location.href = '/admin';
-        reloadQuizs();
-      },
-      error: function( e0, e1, e2 ){
-      }
-    });
+    if( attributes_quiznum == -1 || result_quiznum < attributes_quiznum ){
+      $.ajax({
+        type: 'POST',
+        url: '/dbapi/quiz',
+        data: data,
+        success: function( result ){
+          //location.href = '/admin';
+          reloadQuizs();
+        },
+        error: function( e0, e1, e2 ){
+        }
+      });
+    }else{
+      alert( '<%= __("admin.overquiznum.0") %> ' + attributes_quiznum + '<%= __("admin.overquiznum.1") %>' );
+    }
   }
 }
 
@@ -130,37 +168,45 @@ function saveQuizset(){
     login_username: quizset_login_username,
     login_password: quizset_login_password,
     user_id: uuid,
-    user_name: ''
+    user_name: user.name 
   };
   console.log( quizset_id, data );
   if( quizset_id ){
-    $.ajax({
-      type: 'PUT',
-      url: '/dbapi/quizset/' + quizset_id,
-      contentType: 'application/json',
-      dataType: 'json',
-      data: JSON.stringify( data ),
-      success: function( result ){
-        //location.href = '/admin';
-        reloadQuizsets();
-      },
-      error: function( e0, e1, e2 ){
-        console.log( e0, e1, e2 );
-      }
-    });
+    if( attributes_quizsetnum == -1 || result_quizsetnum <= attributes_quizsetnum ){
+      $.ajax({
+        type: 'PUT',
+        url: '/dbapi/quizset/' + quizset_id,
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify( data ),
+        success: function( result ){
+          //location.href = '/admin';
+          reloadQuizsets();
+        },
+        error: function( e0, e1, e2 ){
+          console.log( e0, e1, e2 );
+        }
+      });
+    }else{
+      alert( '<%= __("admin.overquizsetnum.0") %> ' + attributes_quizsetnum + '<%= __("admin.overquizsetnum.1") %>' );
+    }
   }else{
-    $.ajax({
-      type: 'POST',
-      url: '/dbapi/quizset',
-      data: data,
-      success: function( result ){
-        //location.href = '/admin';
-        reloadQuizsets();
-      },
-      error: function( e0, e1, e2 ){
-        console.log( e0, e1, e2 );
-      }
-    });
+    if( attributes_quizsetnum == -1 || result_quizsetnum < attributes_quizsetnum ){
+      $.ajax({
+        type: 'POST',
+        url: '/dbapi/quizset',
+        data: data,
+        success: function( result ){
+          //location.href = '/admin';
+          reloadQuizsets();
+        },
+        error: function( e0, e1, e2 ){
+          console.log( e0, e1, e2 );
+        }
+      });
+    }else{
+      alert( '<%= __("admin.overquizsetnum.0") %> ' + attributes_quizsetnum + '<%= __("admin.overquizsetnum.1") %>' );
+    }
   }
 }
 
@@ -322,7 +368,7 @@ function createQuizset(){
         login_username: '',
         login_password: '',
         user_id: uuid,
-        user_name: ''
+        user_name: user.name
       };
       $.ajax({
         type: 'POST',
@@ -370,6 +416,15 @@ html, body{
 </style>
 </head>
 <body>
+
+<nav class="navbar fixed-top">
+  <div class="navbar-nav mr-auto">
+  </div>
+  <div class="navbar-nav">
+    <li class="nav-item" id="navitem">
+    </li>
+  </div>
+</nav>
 
 <div class="container_ p-3" id="admin_body">
   <ul class="nav nav-tabs">
