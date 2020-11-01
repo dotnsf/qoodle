@@ -31,12 +31,6 @@ Quiz platform, based on [Doodle Share](https://github.com/dotnsf/doodle_share/).
 
     - exports.db_password : password for IBM Cloudant
 
-    - exports.admin_username : username for Basic Authenticate to access /quizset and /admin
-
-    - exports.admin_password : password for Basic Authenticate to access /quizset and /admin
-
-    - exports.defaultroom : default room name when not specified
-
 - Deploy application into IBM Cloud
 
 
@@ -59,7 +53,7 @@ Participant need **1 PC** and **1 smartphone**:
 
 ## How to use
 
-- First, administrator need to access to /admin, and edit quiz and quizset.
+- First, administrator need to access to /, signup if needed, log into system, and edit quiz and quizset.
 
   - See below how to edit quiz and quizset.
 
