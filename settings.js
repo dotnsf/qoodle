@@ -1,6 +1,6 @@
 var request = require( 'request' );
-exports.db_username = '7f3926bb-734e-434c-baaa-f05e17f3565f-bluemix';
-exports.db_password = 'cfb27c55157becc81fe0e62a1af3e24f09dbc1ef84607ad9b1fcfc308f6e1a43';
+exports.db_username = '';
+exports.db_password = '';
 exports.db_name_quiz = 'qoodle_quiz';
 exports.db_name_quizset = 'qoodle_quizset';
 exports.db_name_answer = 'qoodle_answer';
@@ -13,11 +13,11 @@ exports.defaultroom = 'default';
 
 //. IBM App ID
 exports.region = 'us-south';
-exports.tenantId = '29ef43f3-9313-4ade-9c35-0cbdc14c4fd0';
-exports.apiKey = 'NW6xGmZr8lc6xO-8YoIFD8xQbH2vLkyCtY_s49W96U5s';
-exports.secret = 'N2NkMWY2NDAtZDYyYS00NTc5LTg5MjctMmJiNGZhODg5NzVk';
-exports.clientId = 'e68e272b-5b86-4c3f-a8c9-6f8ffb041cfd';
-exports.oauthServerUrl = 'https://us-south.appid.cloud.ibm.com/oauth/v4/29ef43f3-9313-4ade-9c35-0cbdc14c4fd0';
+exports.tenantId = '';
+exports.apiKey = '';
+exports.secret = '';
+exports.clientId = '';
+exports.oauthServerUrl = '';
 exports.redirectUri = 'http://localhost:8080/appid/callback';
 
 if( process.env.VCAP_SERVICES ){
