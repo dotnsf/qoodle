@@ -53,7 +53,7 @@ Participant need **1 PC** and **1 smartphone**:
 
 ## How to use
 
-- First, administrator need to access to /, signup if needed, log into system, and edit quiz and quizset.
+- First, administrator need to access to /, signup if needed, login to system, and edit quiz and quizset.
 
   - See below how to edit quiz and quizset.
 
