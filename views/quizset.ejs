@@ -147,6 +147,7 @@ var socketio = null;
 var socket_ids = [];
 
 var base_url = location.origin + '/';
+console.log( 'base_url = ' + base_url );
 
 var cards = [];    //. カード
 var imgs = {};     //. 画像データ
@@ -173,7 +174,7 @@ var current_point = 0;
 $(function(){
   socketio = io.connect();
 
-  QRCode.toCanvas( document.getElementById( 'qrcode' ), base_url + '?room=<%= room %>', function( err ){
+  QRCode.toCanvas( document.getElementById( 'qrcode' ), base_url + 'client?room=<%= room %>', function( err ){
     if( err ){ console.log( err ); }
   });
 

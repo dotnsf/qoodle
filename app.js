@@ -51,7 +51,7 @@ settings.getAccessToken().then( function( token ){
 });
 
 /*
-app.all( '/admin', basicAuth( function( user, pass ){
+app.all( '/', basicAuth( function( user, pass ){
   if( settings.admin_username && settings.admin_password ){
     return ( settings.admin_username === user && settings.admin_password === pass );
   }else{
@@ -129,7 +129,7 @@ app.use( '/dbapi', dbapi );
 
 //. login
 app.get( '/appid/login', passport.authenticate( WebAppStrategy.STRATEGY_NAME, {
-  successRedirect: '/admin',
+  successRedirect: '/',
   forceLogin: false //true
 }));
 
@@ -142,7 +142,7 @@ app.get( '/appid/callback', function( req, res, next ){
 //. logout
 app.get( '/appid/logout', function( req, res ){
   WebAppStrategy.logout( req );
-  res.redirect( '/admin' );
+  res.redirect( '/' );
 });
 
 //. get user info
@@ -164,7 +164,7 @@ app.get( '/appid/user', async function( req, res ){
 });
 
 
-app.get( '/admin', function( req, res ){
+app.get( '/', function( req, res ){
   res.render( 'admin', {} );
 });
 
@@ -174,6 +174,12 @@ app.get( '/draw', function( req, res ){
   var room = req.query.room;
   if( !room ){ room = settings.defaultroom; }
   res.render( 'draw', { name: name, room: room } );
+});
+
+app.get( '/client', function( req, res ){
+  var room = req.query.room;
+  if( !room ){ room = settings.defaultroom; }
+  res.render( 'client', { room: room } );
 });
 
 app.get( '/quizset', function( req, res ){

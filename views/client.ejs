@@ -52,7 +52,7 @@ html, body{
 <body>
 
 <div class="container">
-  <input type="text" class="form-control" id="room" value="" placeholder="Room" />
+  <input type="text" class="form-control" id="room" value="<%= room %>" placeholder="Room" />
   <input type="hidden" id="ui" value="draw"/>
   <input type="text" class="form-control" id="name" value="" placeholder="Your name .." />
   <input type="button" class="btn btn-xs btn-primary" value="Start" onClick="startDrawing();"/>
@@ -68,6 +68,7 @@ $(function(){
     }
   }
 
+  /*
   var params = location.search.substring( 1 ).split( '&' );
   params.forEach( function( param ){
     var str = param.split( '=' );
@@ -75,6 +76,7 @@ $(function(){
       $('#room').val( unescape( str[1] ) );
     }
   });
+  */
 });
 
 function startDrawing(){
