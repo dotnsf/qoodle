@@ -50,6 +50,7 @@ settings.getAccessToken().then( function( token ){
   console.log( err );
 });
 
+/*
 app.all( '/admin', basicAuth( function( user, pass ){
   if( settings.admin_username && settings.admin_password ){
     return ( settings.admin_username === user && settings.admin_password === pass );
@@ -57,6 +58,7 @@ app.all( '/admin', basicAuth( function( user, pass ){
     return true;
   }
 }));
+*/
 
 //. URL パラメータ毎に認証情報を変えたい
 app.use( function( req, res, next ){
