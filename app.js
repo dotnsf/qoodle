@@ -155,7 +155,7 @@ app.get( '/appid/user', async function( req, res ){
         id: req.user.sub,
         name: req.user.name,
         email: req.user.email,
-        attributes: profile.attributes
+        attributes: profile.profile.attributes
       }
     });
   }
@@ -285,37 +285,8 @@ async function getProfile( userId ){
           reject( err1 );
         }else{
           var profile = JSON.parse( body1 );
-          console.log( JSON.stringify( profile, null, 2 ) );
+          //console.log( JSON.stringify( profile, null, 2 ) );
           resolve( { status: true, profile: profile } );
-
-          /*
-          var headers2 = {
-            accept: 'application/json',
-            authorization: 'Bearer ' + access_token
-          };
-          var option2 = {
-            url: 'https://' + region + '.appid.cloud.ibm.com/management/v4/' + tenantId + '/users/' + userId + '/roles',
-            method: 'GET',
-            headers: headers2
-          };
-          request( option2, ( err2, res2, body2 ) => {
-            if( err2 ){
-              console.log( 'err2', err2 );
-              reject( err2 );
-            }else{
-              //. this means no error
-              body2 = JSON.parse( body2 );
-              var roles = body2.roles;
-
-              //. カスタム属性
-              //. https://qiita.com/yo24/items/7b577891d67cec52d9b2
-
-              //console.log( profile, roles );
-              console.log( JSON.stringify( profile, null, 2 ) );
-              resolve( { status: true, profile: profile, roles: roles } );
-            }
-          });
-          */
         }
       });
     }

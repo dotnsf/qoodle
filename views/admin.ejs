@@ -25,6 +25,7 @@ $(function(){
     type: 'GET',
     url: '/appid/user',
     success: function( result ){
+      console.log( result );
       user = result.user;
       uuid = result.user.email;
       if( result.user.attributes && result.user.attributes.quiz ){
