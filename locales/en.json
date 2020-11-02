@@ -39,7 +39,7 @@
   "quizset.hiderankmodal.button": "Hide",
   "quizset.recordanswers.button": "Record Answers to DB",
   "quizset.recordanswers.recording": "Recording..",
-  "admin.login": "Login",
+  "admin.login": "Login/Signin",
   "admin.logout": "Logout",
   "admin.overquiznum.0": "You can save quizs up to #",
   "admin.overquiznum.1": ".",
