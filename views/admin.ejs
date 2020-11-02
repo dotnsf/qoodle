@@ -382,35 +382,39 @@ function forDisplay( str, n ){
 }
 
 function createQuizset(){
-  var subject = window.prompt( '<%= __("admin.createquizset.confirm") %>' );
-  if( subject ){
-    var checked_ids = [];
-    $('.quiz_check').each( function( idx, qc ){
-      if( $(qc).prop( 'checked' ) ){
-        var id = $(qc).attr( 'id' );
-        id = id.substr( 11 );
-        checked_ids.push( id );
-      }
-    });
-    if( checked_ids.length > 0 ){
-      var data = {
-        subject: subject,
-        quiz_ids: checked_ids,
-        login_username: '',
-        login_password: '',
-        user_id: uuid,
-        user_name: user.name
-      };
-      $.ajax({
-        type: 'POST',
-        url: '/dbapi/quizset',
-        data: data,
-        success: function( result ){
-          location.href = '/';
-        },
-        error: function( e0, e1, e2 ){
+  if( attributes_quizsetnum == -1 || result_quizsetnum < attributes_quizsetnum ){
+    var subject = window.prompt( '<%= __("admin.createquizset.confirm") %>' );
+    if( subject ){
+      var checked_ids = [];
+      $('.quiz_check').each( function( idx, qc ){
+        if( $(qc).prop( 'checked' ) ){
+          var id = $(qc).attr( 'id' );
+          id = id.substr( 11 );
+          checked_ids.push( id );
         }
       });
+      if( checked_ids.length > 0 ){
+        var data = {
+          subject: subject,
+          quiz_ids: checked_ids,
+          login_username: '',
+          login_password: '',
+          user_id: uuid,
+          user_name: user.name
+        };
+        $.ajax({
+          type: 'POST',
+          url: '/dbapi/quizset',
+          data: data,
+          success: function( result ){
+            location.href = '/';
+          },
+          error: function( e0, e1, e2 ){
+          }
+        });
+      }
+    }else{
+      alert( '<%= __("admin.overquizsetnum.0") %> ' + attributes_quizsetnum + '<%= __("admin.overquizsetnum.1") %>' );
     }
   }
 }
