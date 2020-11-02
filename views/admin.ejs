@@ -63,7 +63,7 @@ $(function(){
       if( result.user.attributes && result.user.attributes.quizset ){
         attributes_quizsetnum = result.user.attributes.quizset;
       }
-      $('#navitem').html( '<a class="nav-link" href="/appid/logout">' + user.name + '</a>' );
+      $('#navitem').html( '<a class="nav-link" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
 
       reloadQuizs();
       reloadQuizsets();

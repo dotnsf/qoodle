@@ -40,6 +40,7 @@
 	"quizset.recordanswers.button": "得点をDBに記録",
 	"quizset.recordanswers.recording": "記録中..",
     "admin.login": "ログイン",
+    "admin.logout": "ログアウト",
     "admin.overquiznum.0": "クイズは ",
     "admin.overquiznum.1": " 個まで記録可能です。",
     "admin.overquizsetnum.0": "クイズセットは ",

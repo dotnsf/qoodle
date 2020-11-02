@@ -40,6 +40,7 @@
   "quizset.recordanswers.button": "Record Answers to DB",
   "quizset.recordanswers.recording": "Recording..",
   "admin.login": "Login",
+  "admin.logout": "Logout",
   "admin.overquiznum.0": "You can save quizs up to #",
   "admin.overquiznum.1": ".",
   "admin.overquizsetnum.0": "You can save quizsets up to #",
