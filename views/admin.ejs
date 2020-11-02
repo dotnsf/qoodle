@@ -54,7 +54,7 @@ $(function(){
     type: 'GET',
     url: '/appid/user',
     success: function( result ){
-      console.log( result );
+      //console.log( result );
       user = result.user;
       uuid = result.user.email;
       if( result.user.attributes && result.user.attributes.quiz ){
@@ -63,13 +63,17 @@ $(function(){
       if( result.user.attributes && result.user.attributes.quizset ){
         attributes_quizsetnum = result.user.attributes.quizset;
       }
-      $('#navitem').html( '<a class="nav-link" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
+      if( attributes_quiznum == -1 && attributes_quizsetnum == -1 ){
+        $('#navitem').html( '<a class="nav-link btn logged-paid-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
+      }else{
+        $('#navitem').html( '<a class="nav-link btn logged-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
+      }
 
       reloadQuizs();
       reloadQuizsets();
     },
     error: function( e0, e1, e2 ){
-      $('#navitem').html( '<a class="nav-link" href="/appid/login"><%= __("admin.login") %></a>' );
+      $('#navitem').html( '<a class="nav-link btn login-btn" id="login-btn" href="/appid/login"><%= __("admin.login") %></a>' );
       $('#admin_body').html( '<img src="/Qoodle_logo.jpg"/>' );  //. #43
     }
   });
@@ -447,6 +451,22 @@ html, body{
 }
 .list-table{
   font-size: 12px;
+}
+
+.login-btn{
+  background-color: #ff0;
+  color: #000;
+  font-weight: bold;
+}
+.logged-btn{
+  background-color: #080;
+  color: #fff;
+  font-weight: bold;
+}
+.logged-paid-btn{
+  background-color: #008;
+  color: #ff0;
+  font-weight: bold;
 }
 </style>
 </head>
