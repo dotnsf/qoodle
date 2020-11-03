@@ -39,6 +39,8 @@
 	"quizset.hiderankmodal.button": "表示終了",
 	"quizset.recordanswers.button": "得点をDBに記録",
 	"quizset.recordanswers.recording": "記録中..",
+    "quizset.quiz.generatedby.0": "（クイズ作成 : ",
+    "quizset.quiz.generatedby.1": "）",
     "admin.login": "ログイン／サインアップ",
     "admin.logout": "ログアウト",
     "admin.overquiznum.0": "クイズは ",

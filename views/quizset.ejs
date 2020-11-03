@@ -142,7 +142,7 @@ html, body{
 </div>
 
 <script>
-var uuid = generateUUID();
+var uuid = getUserId();
 var socketio = null;
 var socket_ids = [];
 
@@ -500,6 +500,13 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
             html += '<br/>'
               + '<input id="rng" type="range" value="9" min="0" max="9" step="1" onInput="changeBlur();"/> <span id="range_value">10</span>';
             break;
+          }
+          
+          //. #48
+          if( uuid && uuid != result.body.user_id ){
+            html += '<div style="text-align: right;">'
+              + '<%=  __("quizset.quiz.generatedby.0") %>' + result.body.user_name + '<%= __("quizset.quiz.generatedby.1") %>'
+              + '</div>';
           }
 
           html += '</div>';

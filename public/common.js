@@ -75,6 +75,46 @@ function generateUUID(){
   return did;
 }
 
+function setUserId( user_id ){
+  if( user_id ){
+    var dt = ( new Date() );
+    var ts = dt.getTime();
+    ts += 1000 * 60 * 60 * 24 * 365 * 100; //. 100 years
+    dt.setTime( ts );
+    var value = ( "uid=" + did + '; expires=' + dt.toUTCString() + '; path=/' );
+    if( isMobileSafari() ){
+      $.ajax({
+        url: '/setcookie',
+        type: 'POST',
+        data: { value: value },
+        success: function( r ){
+          //console.log( 'success: ', r );
+        },
+        error: function( e0, e1, e2 ){
+          //console.log( 'error: ', e1, e2 );
+        }
+      });
+    }else{
+      document.cookie = ( value );
+      //console.log( 'value: ', value );
+    }
+  }
+}
+
+function getUserId(){
+  var user_id = null;
+  cookies = document.cookie.split(";");
+  for( var i = 0; i < cookies.length; i ++ ){
+    var str = cookies[i].split("=");
+    var une = unescape( str[0] );
+    if( une == " uid" || une == "uid" ){
+      user_id = unescape( unescape( str[1] ) );
+    }
+  }
+
+  return user_id;
+}
+
 function isMobileSafari(){
   return ( navigator.userAgent.indexOf( 'Safari' ) > 0 && navigator.userAgent.indexOf( 'Mobile' ) > 0 );
 }
