@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  description: Qoodle API ドキュメント
+  description: Qdle API ドキュメント
   version: 0.0.1
-  title: Qoodle REST APIs
+  title: Qdle REST APIs
 host: localhost:8080
 basePath: /dbapi
 tags:

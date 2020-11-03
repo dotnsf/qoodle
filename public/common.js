@@ -81,7 +81,7 @@ function setUserId( user_id ){
     var ts = dt.getTime();
     ts += 1000 * 60 * 60 * 24 * 365 * 100; //. 100 years
     dt.setTime( ts );
-    var value = ( "uid=" + did + '; expires=' + dt.toUTCString() + '; path=/' );
+    var value = ( "uid=" + user_id + '; expires=' + dt.toUTCString() + '; path=/' );
     if( isMobileSafari() ){
       $.ajax({
         url: '/setcookie',
