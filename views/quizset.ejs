@@ -180,57 +180,59 @@ $(function(){
 
   init();
 
-  $.ajax({
-    type: 'GET',
-    url: '/dbapi/quizset/<%= id %>?include_docs=1',
-    success: function( result ){
-      if( result && result.status && result.body && result.body.quizs ){
-        $('#subject').html( result.body.subject );
-        var cats = ['<%= __("admin.category.0") %>','<%= __("admin.category.1") %>','<%= __("admin.category.2") %>','<%= __("admin.category.3") %>','<%= __("admin.category.4") %>','<%= __("admin.category.5") %>'];
-        for( var i = 0; i < result.body.quizs.length; i ++ ){
-          var quiz = result.body.quizs[i];
-          var img = '';
-          if( quiz.img_url ){
-            if( quiz.category < 4 ){
-              //. 画像
-              img = '<img src="' + quiz.img_url + '" width="100"/>';
-            }else if( quiz.category == 4 ){
-              //. サウンド
-              img = '<img src="//2.bp.blogspot.com/-I_cufIa0hF8/WxvJ4aLXdkI/AAAAAAABMk0/owKqed9VWX4hw36JShIJW3kyY6IUTV91QCLcBGAs/s180/file_icon_mark_music.png" width="100"/>';
-            }else if( quiz.category == 5 ){
-              //. 動画
-              img = '<img src="//3.bp.blogspot.com/-wb-AKkcqcr0/WxvJ5MDTWrI/AAAAAAABMlA/ohMFYIDhi5UJDL3U2Ww40xMAAS0VJHIRgCLcBGAs/s180/file_icon_mark_video.png" width="100"/>';
+  if( uuid ){ //. #50
+    $.ajax({
+      type: 'GET',
+      url: '/dbapi/quizset/<%= id %>?include_docs=1',
+      success: function( result ){
+        if( result && result.status && result.body && result.body.quizs ){
+          $('#subject').html( result.body.subject );
+          var cats = ['<%= __("admin.category.0") %>','<%= __("admin.category.1") %>','<%= __("admin.category.2") %>','<%= __("admin.category.3") %>','<%= __("admin.category.4") %>','<%= __("admin.category.5") %>'];
+          for( var i = 0; i < result.body.quizs.length; i ++ ){
+            var quiz = result.body.quizs[i];
+            var img = '';
+            if( quiz.img_url ){
+              if( quiz.category < 4 ){
+                //. 画像
+                img = '<img src="' + quiz.img_url + '" width="100"/>';
+              }else if( quiz.category == 4 ){
+                //. サウンド
+                img = '<img src="//2.bp.blogspot.com/-I_cufIa0hF8/WxvJ4aLXdkI/AAAAAAABMk0/owKqed9VWX4hw36JShIJW3kyY6IUTV91QCLcBGAs/s180/file_icon_mark_music.png" width="100"/>';
+              }else if( quiz.category == 5 ){
+                //. 動画
+                img = '<img src="//3.bp.blogspot.com/-wb-AKkcqcr0/WxvJ5MDTWrI/AAAAAAABMlA/ohMFYIDhi5UJDL3U2Ww40xMAAS0VJHIRgCLcBGAs/s180/file_icon_mark_video.png" width="100"/>';
+              }
+            }
+            var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + quiz._id + '\', ' + quiz.category + ', ' + quiz.point + ', \'' + quiz.comment + '\');">' + quiz.body + '</a>';
+            var tr = '<tr id="quiz_' + quiz._id + '">'
+              + '<td><input type="checkbox" id="quiz_check_' + quiz._id + '" disabled="true"/>' + ( i + 1 ) + '</td>'
+              + '<td id="quizcat_' + quiz._id + '">' + cats[quiz.category] + '</td>'
+              + '<td id="quizimg_' + quiz._id + '">' + img + '</td>'
+              + '<td id="quizbody_' + quiz._id + '">' + a + '</td>'
+              //+ '<td id="quizcomment_' + quiz_id + '">' + quiz.comment + '</td>'
+              + '<td id="quizpoint_' + quiz._id + '">' + quiz.point + '</td>'
+              + '</tr>';
+            $('#quizlist_tbody').append( tr );
+  
+            //. 通常問題以外は画像はそのまま表示したくない・・・
+            if( 0 < quiz.category && quiz.category < 4 ){
+              b = 10;  //. ぼかして表示
+              var t = $('#quizimg_'+quiz._id)[0];
+              t.style['-ms-filter'] = 'blur(' + b + 'px)';
+              t.style['filter'] = 'blur(' + b + 'px)';
             }
           }
-          var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + quiz._id + '\', ' + quiz.category + ', ' + quiz.point + ', \'' + quiz.comment + '\');">' + quiz.body + '</a>';
-          var tr = '<tr id="quiz_' + quiz._id + '">'
-            + '<td><input type="checkbox" id="quiz_check_' + quiz._id + '" disabled="true"/>' + ( i + 1 ) + '</td>'
-            + '<td id="quizcat_' + quiz._id + '">' + cats[quiz.category] + '</td>'
-            + '<td id="quizimg_' + quiz._id + '">' + img + '</td>'
-            + '<td id="quizbody_' + quiz._id + '">' + a + '</td>'
-            //+ '<td id="quizcomment_' + quiz_id + '">' + quiz.comment + '</td>'
-            + '<td id="quizpoint_' + quiz._id + '">' + quiz.point + '</td>'
-            + '</tr>';
-          $('#quizlist_tbody').append( tr );
 
-          //. 通常問題以外は画像はそのまま表示したくない・・・
-          if( 0 < quiz.category && quiz.category < 4 ){
-            b = 10;  //. ぼかして表示
-            var t = $('#quizimg_'+quiz._id)[0];
-            t.style['-ms-filter'] = 'blur(' + b + 'px)';
-            t.style['filter'] = 'blur(' + b + 'px)';
-          }
+          $('#quizlist').DataTable({
+            language: { url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json" }
+          })
         }
-
-        $('#quizlist').DataTable({
-          language: { url: "//cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json" }
-        })
+      },
+      error: function( e0, e1, e2 ){
+        console.log( e0, e1, e2 );
       }
-    },
-    error: function( e0, e1, e2 ){
-      console.log( e0, e1, e2 );
-    }
-  });
+    });
+  }
 
   var msg = {
     uuid: uuid,
