@@ -206,7 +206,7 @@ $(function(){
                 img = '<img src="//3.bp.blogspot.com/-wb-AKkcqcr0/WxvJ5MDTWrI/AAAAAAABMlA/ohMFYIDhi5UJDL3U2Ww40xMAAS0VJHIRgCLcBGAs/s180/file_icon_mark_video.png" width="100"/>';
               }
             }
-            var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + quiz._id + '\', ' + quiz.category + ', ' + quiz.point + ', \'' + quiz.comment + '\');">' + quiz.body + '</a>';
+            var a = '<a href="#quiz_body" onClick="selectQuiz(\'' + quiz._id + '\', ' + quiz.category + ', ' + quiz.point + ', \'' + quiz.comment + '\', ' + quiz.countdown + ');">' + quiz.body + '</a>';
             var tr = '<tr id="quiz_' + quiz._id + '">'
               + '<td><input type="checkbox" id="quiz_check_' + quiz._id + '" disabled="true"/>' + ( i + 1 ) + '</td>'
               + '<td id="quizcat_' + quiz._id + '">' + cats[quiz.category] + '</td>'
@@ -431,7 +431,7 @@ function appendCardGroups( cardgroups_selector, num ){
   });
 }
 
-function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
+function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment, quiz_countdown ){
   on_quiz = true;
   activeTab( 'tab-pane-quiz' );
   _quiz_id = quiz_id;
@@ -439,7 +439,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   image_point = quiz_point;
   current_point = quiz_point;
 
-  countdown = 30;  //. #51 
+  countdown = ( quiz_countdown ? quiz_countdown : 30 );  //. #51 
   if( quiz_category == 0 ){
     $('#quizFinishBtn').html( countdown );
   }else{

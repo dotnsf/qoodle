@@ -642,6 +642,9 @@ definitions:
       point:
         type: integer
         description: 得点
+      countdown:
+        type: integer
+        description: 解答時間（秒）
       body:
         type: string
         description: 出題内容

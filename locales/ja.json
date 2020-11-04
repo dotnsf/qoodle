@@ -72,6 +72,7 @@
 	"admin.quiztable.column.5": "画像URL",
 	"admin.quiztable.column.6": "更新日時",
 	"admin.quiztable.column.7": "アクション",
+    "admin.quiztable.column.8": "解答時間（秒）",
 	"admin.quiztable.resetbutton.label": "リセット",
 	"admin.quiztable.savebutton.label": "保存",
     "admin.quiztable.createquizsetbutton.label": "クイズセット作成",

@@ -98,6 +98,7 @@ function reloadQuizs(){
             + '<td><input type="checkbox" class="quiz_check" id="quiz_check_' + quiz._id + '"/>' + quiz._id + '</td>'
             + '<td>' + categories[quiz.category] + '</td>'
             + '<td>' + quiz.point + '</td>'
+            + '<td>' + ( quiz.countdown ? quiz.countdown : 30 ) + '</td>'
             + '<td>' + quiz.body + '</td>'
             + '<td>' + quiz.comment + '</td>'
             + '<td>' + quiz.img_url + '</td>'
@@ -151,6 +152,7 @@ function saveQuiz(){
   var data = {
     category: parseInt( $('#edit_quiz_category').val() ),
     point: parseInt( $('#edit_quiz_point').val() ),
+    countdown: parseInt( $('#edit_quiz_countdown').val() ),
     body: $('#edit_quiz_body').val(),
     comment: $('#edit_quiz_comment').val(),
     img_url: $('#edit_quiz_img_url').val(),
@@ -303,6 +305,7 @@ function editQuiz( quiz ){
   }
   $('#edit_quiz_category').val( quiz.category );
   $('#edit_quiz_point').val( quiz.point );
+  $('#edit_quiz_countdown').val( ( quiz.countdown ? quiz.countdown : 30 ) );
   $('#edit_quiz_body').val( quiz.body );
   $('#edit_quiz_comment').val( quiz.comment );
   $('#edit_quiz_img_url').val( quiz.img_url );
@@ -368,6 +371,7 @@ function openQuizset( id ){
 function resetQuiz(){
   $('#edit_quiz_id').val('');
   $('#edit_quiz_point').val('');
+  $('#edit_quiz_countdown').val('');
   $('#edit_quiz_body').val('');
   $('#edit_quiz_comment').val('');
   $('#edit_quiz_img_url').val('');
@@ -536,7 +540,7 @@ html, body{
     <div id="tab-pane-quiz" class="tab-pane">
       <table class="table table-bordered list-table">
         <thead id="quiz_table_heat">
-          <tr><th>#</th><th><%= __("admin.quiztable.column.1") %></th><th><%= __("admin.quiztable.column.2") %></th><th><%= __("admin.quiztable.column.3") %></th><th><%= __("admin.quiztable.column.4") %></th><th><%= __("admin.quiztable.column.5") %></th><th><%= __("admin.quiztable.column.6") %></th><th><%= __("admin.quiztable.column.7") %></th></tr>
+          <tr><th>#</th><th><%= __("admin.quiztable.column.1") %></th><th><%= __("admin.quiztable.column.2") %></th><th><%= __("admin.quiztable.column.8") %></th><th><%= __("admin.quiztable.column.3") %></th><th><%= __("admin.quiztable.column.4") %></th><th><%= __("admin.quiztable.column.5") %></th><th><%= __("admin.quiztable.column.6") %></th><th><%= __("admin.quiztable.column.7") %></th></tr>
         </thead>
         <tbody id="quiz_table_body">
         </tbody>
@@ -564,6 +568,10 @@ html, body{
         <tr>
           <td><%= __("admin.quiztable.column.2") %></td>
           <td><input type="text" class="form-control" id="edit_quiz_point" value=""/></td>
+        </tr>
+        <tr>
+          <td><%= __("admin.quiztable.column.8") %></td>
+          <td><input type="text" class="form-control" id="edit_quiz_countdown" value=""/></td>
         </tr>
         <tr>
           <td><%= __("admin.quiztable.column.3") %></td>

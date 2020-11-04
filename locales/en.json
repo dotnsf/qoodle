@@ -73,6 +73,7 @@
   "admin.quiztable.column.5": "image url",
   "admin.quiztable.column.6": "updated",
   "admin.quiztable.column.7": "actions",
+  "admin.quiztable.column.8": "sec",
   "admin.quiztable.resetbutton.label": "Reset",
   "admin.quiztable.savebutton.label": "Save",
   "admin.quiztable.createquizsetbutton.label": "Create Quizset",
