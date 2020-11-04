@@ -63,11 +63,6 @@ html, body{
 #my-navbar{
   color: #f00;
 }
-#quiz_countdown{
-  font-weight: bold;
-  color: #f00;
-  display: none;
-}
 #quiz_answer{
   color: #f00;
 }
@@ -123,7 +118,6 @@ html, body{
     <div id="tab-pane-quiz" class="tab-pane active">
       <div id="quiz_div">
       </div>
-      <div id="quiz_countdown"></div>
       <div id="quiz_answer"></div>
       <button id="quizFinishBtn" class="btn btn-primary" onClick="quizFinish();"><%= __('quizset.quizfinish.button') %></button>
     </div>
@@ -446,8 +440,11 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
   current_point = quiz_point;
 
   countdown = 30;  //. #51 
-  $('#quiz_countdown').css( 'display', 'inline' );
-  $('#quiz_countdown').html( countdown );
+  if( quiz_category == 0 ){
+    $('#quizFinishBtn').html( countdown );
+  }else{
+    $('#quizFinishBtn').html( "<%= __('quizset.quizfinish.button') %>" );
+  }
 
   if( !answers[quiz_id] ){ answers[quiz_id] = {}; }
 
@@ -504,7 +501,6 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
           switch( result.body.category ){
           case 0:
             //. 一般クイズ
-            $('#quiz_countdown').css( 'display', 'block' );
             countdown_ = setInterval( drawCountdown, 1000 );
             break;
           case 1:
@@ -611,7 +607,7 @@ function selectQuiz( quiz_id, quiz_category, quiz_point, quiz_comment ){
 function drawCountdown(){
   if( countdown > 0 ){
     countdown --;
-    $('#quiz_countdown').html( countdown );
+    $('#quizFinishBtn').html( countdown );
   }else{
     clearInterval( countdown_ );
     countdown_ = null;
@@ -626,7 +622,6 @@ function quizFinish(){
     countdown_ = null;
   }
 
-  $('#quiz_countdown').css( 'display', 'none' );
   $('#quiz_answer').css( 'display', 'inline' );
   $('#quizFinishBtn').css( 'display', 'none' );
 }
