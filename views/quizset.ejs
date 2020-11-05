@@ -80,6 +80,13 @@ html, body{
   cursor: pointer;
   padding: 5px;
 }
+#qrcode:active{ /* #56 の「押した感」 */
+  border: 1px solid #334c66;
+  background-color: #69c;
+  -webkit-box-shadow:inset 0px 0px 8px #334c66;
+  -moz-box-shadow: inset 0px 0px 2px #3a6da0;
+  box-shadow: 0px 0px 2px #3a6da0;
+}
 </style>
 </head>
 <body>
@@ -178,7 +185,14 @@ $(function(){
   socketio = io.connect();
 
   QRCode.toCanvas( document.getElementById( 'qrcode' ), base_url + 'client?room=<%= room %>', function( err ){
-    if( err ){ console.log( err ); }
+    if( err ){
+      console.log( err );
+    }else{
+      //. #56
+      $('#qrcode').on( 'click', function( e ){
+        copyClipboard( base_url + 'client?room=<%= room %>' );
+      });
+    }
   });
 
   init();
@@ -725,6 +739,7 @@ function recordAnswer( uuid, answer ){
     }
   });
 }
+
 function updateAnswer( _id, uuid, answer ){
   var data = {
     quizset_id: '<%= id %>',
@@ -850,6 +865,34 @@ function sortByRank( a, b ){
   }
 
   return r;
+}
+
+//. #56
+function copyClipboard( str ){
+  //. 空 div と空 pre
+  var tmp = document.createElement( 'div' );
+  var pre = document.createElement( 'pre' );
+
+  pre.style.webkitUserSelect = 'auto';
+  pre.style.userSelect = 'auto';
+  tmp.appendChild( pre ).textContent = str;
+
+  //. 画面外へ
+  var s = tmp.style;
+  s.position = 'fixed';
+  s.right = '200%';
+
+  //. body に追加
+  document.body.appendChild( tmp );
+  document.getSelection().selectAllChildren( tmp );
+
+  //. クリップボードにコピー
+  var result = document.execCommand( "copy" );
+
+  //. 要素削除
+  document.body.removeChild( tmp );
+
+  return result;
 }
 </script>
 </body>
