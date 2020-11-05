@@ -267,7 +267,8 @@ function previewQuiz( quiz ){
     if( quiz.category == 1 ){
       html += '<div id="demoMap"></div>';
     }else if( quiz.category == 0 || quiz.category == 3 ){
-      html += '<div><img id="q_image" src="' + quiz.img_url + '" height="90%"/></div>';
+      //html += '<div><img id="q_image" src="' + quiz.img_url + '" height="90%"/></div>';
+      html += '<div><img id="q_image" src="' + quiz.img_url + '" width="90%"/></div>';
     }else if( quiz.category == 2 ){
       html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + quiz.img_url + '\');"></table></div>';
     }else if( quiz.category == 4 ){
@@ -749,7 +750,7 @@ html, body{
 
 <div class="modal bd-example-modal-xl fade" id="previewModal" tabindex="-1" role="dialog" aria-labbelledby="previewModal" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-xl">
-    <div class="container">
+    <div class="container" style="position: relative; left: -300px;">
 
     <div class="modal-content">
       <div class="modal-header">
