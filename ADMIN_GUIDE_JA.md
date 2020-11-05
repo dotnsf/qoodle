@@ -37,7 +37,7 @@
 
 - パソコンのウェブブラウザ（FireFox, または Chrome）で以下へアクセスします：
 
-https://qdle.mybluemix.net/
+https://qdle.jp/
 
 ![qdle_admin_ja_01.png](./doc/qdle_admin_ja_01.png)
 
@@ -59,7 +59,7 @@ https://qdle.mybluemix.net/
 
   - この場合のクイズ参加用 URL は以下になります：
 
-    - https://qdle.mybluemix.net/client?id=(ID列の値)&room=(指定したroomの値)
+    - https://qdle.jp/client?id=(ID列の値)&room=(指定したroomの値)
 
       - room を指定しないで ID 列を選択した場合、room=XXXXXX の XXXXXX 部分がランダムに生成されます
 
