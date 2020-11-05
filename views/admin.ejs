@@ -63,21 +63,22 @@ $(function(){
       uuid = result.user.email;
       if( uuid ){
         setUserId( uuid );
-      }
-      if( result.user.attributes && result.user.attributes.quiz ){
-        attributes_quiznum = result.user.attributes.quiz;
-      }
-      if( result.user.attributes && result.user.attributes.quizset ){
-        attributes_quizsetnum = result.user.attributes.quizset;
-      }
-      if( attributes_quiznum == -1 && attributes_quizsetnum == -1 ){
-        $('#navitem').html( '<a class="nav-link btn logged-paid-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
-      }else{
-        $('#navitem').html( '<a class="nav-link btn logged-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
-      }
 
-      reloadQuizs();
-      reloadQuizsets();
+        if( result.user.attributes && result.user.attributes.quiz ){
+          attributes_quiznum = result.user.attributes.quiz;
+        }
+        if( result.user.attributes && result.user.attributes.quizset ){
+          attributes_quizsetnum = result.user.attributes.quizset;
+        }
+        if( attributes_quiznum == -1 && attributes_quizsetnum == -1 ){
+          $('#navitem').html( '<a class="nav-link btn logged-paid-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
+        }else{
+          $('#navitem').html( '<a class="nav-link btn logged-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
+        }
+
+        reloadQuizs();
+        reloadQuizsets();
+      }
     },
     error: function( e0, e1, e2 ){
       $('#navitem').html( '<a class="nav-link btn login-btn" id="login-btn" href="/appid/login"><%= __("admin.login") %></a>' );
