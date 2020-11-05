@@ -15,8 +15,9 @@ var express = require( 'express' ),
     WebAppStrategy = require( 'ibmcloud-appid' ).WebAppStrategy,
     uuidv1 = require( 'uuid/v1' ),
     app = express();
-var http = require( 'http' ).createServer( app );
-//var io = require( 'socket.io' ).listen( http );
+var http = require( 'http' ).createServer( app ),
+    https = null;
+var io = null; //require( 'socket.io' ).listen( http );
 
 var settings = require( './settings' );
 
@@ -61,18 +62,17 @@ app.all( '/', basicAuth( function( user, pass ){
 */
 
 //. SSL
-var options = {};
-if( settings.ssl_key ){
+if( settings.ssl_key && settings.ssl_cert && settings.ssl_ca ){
+  var options = {};
   options.key = fs.readFileSync( settings.ssl_key );
-}
-if( settings.ssl_cert ){
   options.cert = fs.readFileSync( settings.ssl_cert );
-}
-if( settings.ssl_ca ){
   options.ca = fs.readFileSync( settings.ssl_ca );
+
+  https = require( 'https' ).createServer( options, app );
+  io = require( 'socket.io' ).listen( https );
+}else{
+  io = require( 'socket.io' ).listen( http );
 }
-var https = require( 'https' ).createServer( options, app );
-var io = require( 'socket.io' ).listen( https );
 
 //. URL パラメータ毎に認証情報を変えたい
 app.use( function( req, res, next ){
@@ -305,7 +305,9 @@ async function getProfile( userId ){
 var port = process.env.PORT || 8080;
 var ports = 8443;
 http.listen( port );
-https.listen( ports );
+if( https ){
+  https.listen( ports );
+}
 console.log( "server starting on " + port + "/" + ports + " ..." );
 
 if( settings.db_username && settings.db_password ){
