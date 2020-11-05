@@ -31,7 +31,7 @@ Quiz platform, based on [Doodle Share](https://github.com/dotnsf/doodle_share/).
 
     - exports.db_password : password for IBM Cloudant
 
-- Deploy application into IBM Cloud
+- Deploy application
 
 
 ## Prerequisites for Quiz conference owner

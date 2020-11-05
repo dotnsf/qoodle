@@ -60,6 +60,19 @@ app.all( '/', basicAuth( function( user, pass ){
 }));
 */
 
+//. SSL
+var options = {};
+if( settings.ssl_key ){
+  options.key = fs.readFileSync( settings.ssl_key );
+}
+if( settings.ssl_cert ){
+  options.cert = fs.readFileSync( settings.ssl_cert );
+}
+if( settings.ssl_ca ){
+  options.ca = fs.readFileSync( settings.ssl_ca );
+}
+var https = require( 'https' ).createServer( options, app );
+
 //. URL パラメータ毎に認証情報を変えたい
 app.use( function( req, res, next ){
   var originalUrl = req.originalUrl;
@@ -289,8 +302,10 @@ async function getProfile( userId ){
 
 //app.listen( appEnv.port );
 var port = process.env.PORT || 8080;
+var ports = 8443;
 http.listen( port );
-console.log( "server starting on " + port + " ..." );
+https.listen( ports );
+console.log( "server starting on " + port + "/" + ports + " ..." );
 
 if( settings.db_username && settings.db_password ){
   var dashboard_url = 'https://' + settings.db_username + ':' + settings.db_password + '@' + settings.db_username + '.cloudant.com/dashboard.html';
