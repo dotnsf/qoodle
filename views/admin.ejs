@@ -82,7 +82,7 @@ $(function(){
     },
     error: function( e0, e1, e2 ){
       $('#navitem').html( '<a class="nav-link btn login-btn" id="login-btn" href="/appid/login"><%= __("admin.login") %></a>' );
-      $('#admin_body').html( '<img src="/qdle_logo.png"/>' );  //. #43
+      $('#admin_body').html( '<h3 class="subtitle"><%= __("common.subtitle") %></h3><img src="/qdle_logo.png"/>' );  //. #43
     }
   });
 });
@@ -623,6 +623,10 @@ html, body{
 .logged-paid-btn{
   background-color: #008;
   color: #ff0;
+  font-weight: bold;
+}
+.subtitle{
+  color: #308;
   font-weight: bold;
 }
 </style>
