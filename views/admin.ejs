@@ -9,6 +9,10 @@
 <link rel="stylesheet" href="//cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.css"/> 
 <script src="//cdn.datatables.net/t/bs-3.3.6/jqc-1.12.0,dt-1.10.11/datatables.min.js"></script>
 <script src="/common.js"></script>
+
+<link rel="stylesheet" href="//unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
+<script src="//unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
@@ -257,6 +261,124 @@ function previewQuiz( quiz ){
   $('#preview-main').html( '' );
   $('#preview-point').html( '' );
 
+  //. #46
+  var html = '<h3>' + quiz.body + '</h3>';
+  if( quiz.img_url ){
+    if( quiz.category == 1 ){
+      html += '<div id="demoMap"></div>';
+    }else if( quiz.category == 0 || quiz.category == 3 ){
+      html += '<div><img id="q_image" src="' + quiz.img_url + '" height="90%"/></div>';
+    }else if( quiz.category == 2 ){
+      html += '<div><table id="open16_table" class="table" style="background-image: url(\'' + quiz.img_url + '\');"></table></div>';
+    }else if( quiz.category == 4 ){
+      html += '<div><audio src="' + quiz.img_url + '" controls></audio></div>';
+    }else if( quiz.category == 5 ){
+      if( quiz.img_url.toLowerCase().endsWith( '.mp4' ) ){
+        html += '<div><video width="560" preloed="true" src="' + quiz.img_url + '" controls></video></div>';
+      }else if( quiz.img_url.toLowerCase().indexOf( 'youtube' ) > -1 ){
+        var tmp1 = quiz.img_url.split( '?' );
+        var v = '';
+        if( tmp1.length > 1 ){
+          var tmp2 = tmp1[1].split( '&' );
+          tmp2.forEach( function( tmp3 ){
+            var tmp4 = tmp3.split( '=' );
+            if( tmp4.length > 1 && tmp4[0] == 'v' ){
+              v = tmp4[1];
+            }
+          });
+        }
+        if( v ){
+          html += '<div>'
+            + '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + v + '" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+            + '</div>';
+        }
+      }
+    }
+  }
+
+  switch( quiz.category ){
+  case 0:
+    //. 一般クイズ
+    break;
+  case 1:
+    //. ズームアウト出題
+    break;
+  case 2:
+    //. 16分割クイズ
+    break;
+  case 3:
+    //. ぼかしクイズ
+    html += '<br/>'
+      + '<input id="rng" type="range" value="9" min="0" max="9" step="1" onInput="changeBlur();"/> <span id="range_value">10</span>';
+    break;
+  }
+  
+  html += '</div>';
+  $('#preview-main').html( html );
+
+  if( quiz.category == 3 ){
+    current_point = 10;
+    var e = document.getElementById( 'q_image' );
+    var iid = setInterval( function(){
+      if( e.complete ){
+        blur_ratio = Math.floor( e.naturalWidth / 100 );
+        //clearInterval( iid );
+        changeBlur();
+      }
+    }, 10 );
+  }else if( quiz.category == 2 ){
+    current_point = 16;
+    image_16_open = 0;
+    for( var i = 0; i < 4; i ++ ){
+      var tr = '<tr id="board_row_' + i + '">';
+      for( var j = 0; j < 4; j ++ ){
+        var num = ( i * 4 + j + 1 );
+        var td = '<td id="panel_' + num + '" class="num_panel" onClick="open16_click(' + num + ');">' + num + '</td>';
+        tr += td;
+      }
+      tr += '</tr>';
+      $('#open16_table').append( tr );
+    }
+  }else if( quiz.category == 1 ){
+    current_point = 10;
+    //. 空の地図を OpenStreetMap データで表示
+    var map = L.map('demoMap', { dragging: true, zoomControl: true, minZoom: 0, maxZoom: 5, crs: L.CRS.Simple, preferCanvas: true } );
+
+    //. 画像パス
+    var imgpath = quiz.img_url;
+    var element = new Image();
+    element.onload = function(){
+      //. 表示する画像のパスとサイズ
+      var image = {
+        url: imgpath,
+        width: element.naturalWidth,
+        height: element.naturalHeight
+      };
+
+      //. 画像領域を地図に設定
+      var imageBounds = L.latLngBounds([
+        map.unproject( [ 0, image.height ] ),
+        map.unproject( [ image.width, 0 ] )
+      ]);
+      map.fitBounds( imageBounds );
+      map.setMaxBounds( imageBounds.pad( 0.5 ) );
+
+      zoomlevel = 5;
+      map.on( 'zoom', function( e ){
+        zoomlevel = map.getZoom();
+        current_point = zoomlevel * 2;
+      });
+      map.setZoom( zoomlevel );
+
+      //. 画像をオーバーレイで設定
+      setTimeout( function(){
+        L.imageOverlay( image.url, imageBounds ).addTo( map );
+        $('#demoMap').css( 'height', image.height + 'px' );
+      }, 100 );
+    }
+    element.src = imgpath;
+  }
+  /*
   var html = '<h2>' + quiz.body + '</h2>';
   if( quiz.img_url ){
     if( quiz.category != 2 ){
@@ -293,6 +415,7 @@ function previewQuiz( quiz ){
     $('#q_image').css( 'display', 'block' );
     $('#preview-point').html( quiz.point );
   }
+  */
   
   $('#previewModal').modal();
 }
@@ -429,6 +552,26 @@ function createQuizset(){
     }
   }
 }
+
+function changeBlur(){
+  var b = parseInt( $('#rng').val() );
+  //current_point = b + 1;
+  $('#range_value').html( ( b + 1 ) );
+  var t = $('#q_image')[0];
+  t.style['-ms-filter'] = 'blur(' + ( b * blur_ratio ) + 'px)';
+  t.style['filter'] = 'blur(' + ( b * blur_ratio ) + 'px)';
+}
+
+function open16_click( num ){
+  var o = $('#panel_'+num).css( 'opacity' );
+  if( o == '1' ){
+    $('#panel_'+num).css( 'border-width', '1px' );
+    $('#panel_'+num).css( 'opacity', '0' );
+
+    //image_16_open ++;
+    //current_point --;
+  }
+}
 </script>
 
 <style type="text/css">
@@ -450,7 +593,12 @@ html, body{
   border-style: solid;
   border-width: 2px;
   text-align: center;
-  opacity: 1;
+  opacity: 1
+}
+.open{
+  background: #ffc;
+  cursor: pointer;
+  padding: 5px;
 }
 #point{
   color: #f00;
@@ -599,8 +747,10 @@ html, body{
   </div>
 </div>
 
-<div class="modal bd-example-modal-lg fade" id="previewModal" tabindex="-1" role="dialog" aria-labbelledby="previewModal" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal bd-example-modal-xl fade" id="previewModal" tabindex="-1" role="dialog" aria-labbelledby="previewModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="container">
+
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="previewModalLabel"></h4>
@@ -620,6 +770,8 @@ html, body{
         <button type="button" class="btn btn-info btn-xs py-0" onClick="migrateFrom();"><i class="fas fa-file-export"></i></button>
         -->
       </div>
+    </div>
+
     </div>
   </div>
 </div>
