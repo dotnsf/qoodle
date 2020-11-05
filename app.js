@@ -16,7 +16,7 @@ var express = require( 'express' ),
     uuidv1 = require( 'uuid/v1' ),
     app = express();
 var http = require( 'http' ).createServer( app );
-var io = require( 'socket.io' ).listen( http );
+//var io = require( 'socket.io' ).listen( http );
 
 var settings = require( './settings' );
 
@@ -72,6 +72,7 @@ if( settings.ssl_ca ){
   options.ca = fs.readFileSync( settings.ssl_ca );
 }
 var https = require( 'https' ).createServer( options, app );
+var io = require( 'socket.io' ).listen( https );
 
 //. URL パラメータ毎に認証情報を変えたい
 app.use( function( req, res, next ){
