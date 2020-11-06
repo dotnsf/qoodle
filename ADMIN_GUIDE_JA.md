@@ -117,7 +117,7 @@ https://qdle.jp/quizset?id=test
 
   - 参加者が１名以上いる状態で、画面下部の解答画面タブを選択すると全参加者のニックネームと現在のキャンバスの様子が表示されます。
 
-![qdle_admin_ja_09.png](./doc/qdle_admin_ja_09.png)
+![qdle_admin_ja_13.png](./doc/qdle_admin_ja_13.png)
 
     - 参加者が増えるとこの画面も更新され、参加者が絵を更新するとこの画面も更新されます
 
