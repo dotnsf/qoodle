@@ -256,6 +256,6 @@ https://qdle.jp/quizset?id=(教えてもらったクイズセットID)
 - 2020.11.06 : v0.0.4 をベースに記載
 
 
-## クイズ主催の画面の説明
+## Copyright
 
-- クイズ主催の画面の各パーツは以下のようになっています：
+2020 [K.Kimura @ Juge.Me](https://github.com/dotnsf) all rights reserved.
