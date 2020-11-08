@@ -84,5 +84,6 @@
   "admin.deletequizset.confirm.0": "",
   "admin.deletequizset.confirm.1": " Deleting quizset. OK ?",
   "admin.createquizset.confirm": "Goint to create new quizset from selected quiz. If OK, please input quizset subject:",
+  "admin.footer.userguide": "User Guide",
   "dummy": "dummy"
 }

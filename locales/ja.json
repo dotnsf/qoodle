@@ -83,5 +83,6 @@
 	"admin.deletequizset.confirm.0": "",
 	"admin.deletequizset.confirm.1": " のクイズセットを削除します。よろしいですか？",
     "admin.createquizset.confirm": "選択されたクイズから新しいクイズセットを生成しますか？その場合はサブジェクトを入力してください：",
+    "admin.footer.userguide": "ユーザーガイド",
 	"dummy": "dummy"
 }
