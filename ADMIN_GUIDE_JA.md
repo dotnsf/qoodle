@@ -260,6 +260,11 @@ https://qdle.jp/quizset?id=(教えてもらったクイズセットID)
 - 2020.11.06 : v0.0.4 をベースに記載
 
 
+## 編集者・連絡先
+
+**qoodle@teyan.de**
+
+
 ## Copyright
 
 2020 [K.Kimura @ Juge.Me](https://github.com/dotnsf) all rights reserved.
