@@ -161,19 +161,26 @@ app.get( '/appid/logout', function( req, res ){
 
 //. get user info
 app.get( '/appid/user', async function( req, res ){
-  if( !req.user ){
+  console.log( req.user );
+  if( !req.user || !req.user.sub ){
     res.status( 401 );
     res.send( '' );
   }else{
     var profile = await getProfile( req.user.sub );
-    res.json({
-      user: {
-        id: req.user.sub,
-        name: req.user.name,
-        email: req.user.email,
-        attributes: profile.profile.attributes
-      }
-    });
+    console.log( profile );
+    if( profile && profile.profile ){
+      res.json({
+        user: {
+          id: req.user.sub,
+          name: req.user.name,
+          email: req.user.email,
+          attributes: profile.profile.attributes
+        }
+      });
+    }else{
+      res.status( 401 );
+      res.send( '' );
+    }
   }
 });
 
@@ -296,6 +303,8 @@ async function getProfile( userId ){
           resolve( { status: true, profile: profile } );
         }
       });
+    }else{
+      reject( 'no access token' );
     }
   });
 }
