@@ -66,7 +66,7 @@ if( settings.db_username && settings.db_password ){
           user_name: 'Qoodle',
           login_username: '',
           login_password: '',
-          crated: ts,
+          created: ts,
           updated: ts
         };
         db_quizset.insert( params, function( err, body, header ){});
@@ -140,7 +140,7 @@ router.post( '/quiz', function( req, res ){
       img_url: img_url,
       user_id: user_id,
       user_name: user_name,
-      crated: ts,
+      created: ts,
       updated: ts
     };
     db_quiz.insert( params, function( err, body, header ){
@@ -370,7 +370,7 @@ router.post( '/quizset', function( req, res ){
       user_name: user_name,
       login_username: login_username,
       login_password: hash_password,
-      crated: ts,
+      created: ts,
       updated: ts
     };
     db_quizset.insert( params, function( err, body, header ){
@@ -624,7 +624,7 @@ router.post( '/answer_bulk', function( req, res ){
             point: point,
             user_id: uuid,
             user_name: '',
-            crated: ts,
+            created: ts,
             updated: ts
           };
           docs.push( doc );
@@ -706,7 +706,7 @@ router.post( '/answer', function( req, res ){
       point: point,
       user_id: user_id,
       user_name: user_name,
-      crated: ts,
+      created: ts,
       updated: ts
     };
     db_answer.insert( params, function( err, body, header ){
@@ -930,7 +930,7 @@ router.post( '/image', function( req, res ){
       quizset_id: quizset_id,
       user_id: user_id,
       user_name: user_name,
-      crated: ts,
+      created: ts,
       updated: ts,
       _attachments: {
         image: {
@@ -1192,7 +1192,8 @@ function generateId(){
 //. https://qiita.com/mas0061/items/c2e9cd0d27e09448d28e
 sanitize = {
   encode : function (str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    //return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return str.replace(/"/g, '”');
   },
 
   decode : function (str) {

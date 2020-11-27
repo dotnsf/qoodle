@@ -85,7 +85,7 @@ $(function(){
       $('#admin_body').html( '<h3 class="subtitle"><%= __("common.subtitle") %></h3><img src="/qdle_logo.png"/>' );  //. #43
     }
   });
-  }, 500 );
+  }, 300 );
 });
 
 function reloadQuizs(){
@@ -424,6 +424,7 @@ function previewQuiz( quiz ){
 }
 
 function editQuiz( quiz ){
+  console.log( quiz );
   if( quiz._id ){
     $('#edit_quiz_id').val( quiz._id );
   }else{
@@ -432,8 +433,8 @@ function editQuiz( quiz ){
   $('#edit_quiz_category').val( quiz.category );
   $('#edit_quiz_point').val( quiz.point );
   $('#edit_quiz_countdown').val( ( quiz.countdown ? quiz.countdown : 30 ) );
-  $('#edit_quiz_body').val( quiz.body );
-  $('#edit_quiz_comment').val( quiz.comment );
+  $('#edit_quiz_body').val( quiz.body.replace(/&quot;/g, '"') );
+  $('#edit_quiz_comment').val( quiz.comment.replace(/&quot;/g, '"') );
   $('#edit_quiz_img_url').val( quiz.img_url );
 }
 
@@ -443,7 +444,7 @@ function editQuizset( quizset ){
   }else{
     $('#edit_quizset_id').val( '' );
   }
-  $('#edit_quizset_subject').val( quizset.subject );
+  $('#edit_quizset_subject').val( quizset.subject.replace(/&quot;/g, '"') );
   $('#edit_quizset_login_username').val( quizset.login_username );
   $('#edit_quizset_login_password').val( quizset.login_password );
   $('#edit_quizset_ids').val( JSON.stringify( quizset.quiz_ids, null , 2 ) );
@@ -574,6 +575,43 @@ function open16_click( num ){
     //image_16_open ++;
     //current_point --;
   }
+}
+
+//. #61
+function quiz_stringify( quiz ){
+  var s = '{'
+    + '"_id": "' + quiz._id + '",'
+    + '"_rev": "' + quiz._rev + '",'
+    + '"body": "' + quiz.body + '",'
+    + '"category": ' + quiz.category + ','
+    + '"comment": "' + quiz.comment + '",'
+    + '"countdown": ' + quiz.countdown + ','
+    + '"created": ' + quiz.created + ','
+    + '"img_url": "' + quiz.img_url + '",'
+    + '"point": ' + quiz.point + ','
+    + '"type": "' + quiz.type + '",'
+    + '"updated": ' + quiz.updated + ','
+    + '"user_id": "' + quiz.user_id + '",'
+    + '"user_name": "' + quiz.user_name + '"'
+    + '}';
+  return s;
+}
+
+function quizset_stringify( quizset ){
+  var s = '{'
+    + '"_id": "' + quizset._id + '",'
+    + '"_rev": "' + quizset._rev + '",'
+    + '"created": ' + quizset.created + ','
+    + '"login_username": "' + quizset.login_username + '",'
+    + '"login_password": "' + quizset.login_password + '",'
+    + '"quiz_ids": ' + JSON.stringify( quizset.quiz_ids ) + ','
+    + '"subject": "' + quizset.subject + '",'
+    + '"type": "' + quizset.type + '",'
+    + '"updated": ' + quizset.updated + ','
+    + '"user_id": "' + quizset.user_id + '",'
+    + '"user_name": "' + quizset.user_name + '"'
+    + '}';
+  return s;
 }
 </script>
 
