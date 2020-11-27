@@ -135,8 +135,8 @@ router.post( '/quiz', function( req, res ){
       category: category,
       point: point,
       countdown: countdown,
-      body: body,
-      comment: comment,
+      body: sanitize.encode( body ),
+      comment: sanitize.encode( comment ),
       img_url: img_url,
       user_id: user_id,
       user_name: user_name,
@@ -261,10 +261,10 @@ router.put( '/quiz/:id', function( req, res ){
             body1.countdown = parseInt( countdown );
           }
           if( body ){
-            body1.body = body;
+            body1.body = sanitize.encode( body );
           }
           if( comment ){
-            body1.comment = comment;
+            body1.comment = sanitize.encode( comment );
           }
           if( img_url ){
             body1.img_url = img_url;
@@ -364,7 +364,7 @@ router.post( '/quizset', function( req, res ){
     var params = {
       _id: id,
       type: 'quizset',
-      subject: subject,
+      subject: sanitize.encode( subject ),
       quiz_ids: quiz_ids,
       user_id: user_id,
       user_name: user_name,
@@ -514,7 +514,7 @@ router.put( '/quizset/:id', function( req, res ){
             body1.quiz_ids = quiz_ids;
           }
           if( subject ){
-            body1.subject = subject;
+            body1.subject = sanitize.encode( subject );
           }
           if( quiz_login_username ){
             body1.login_username = quiz_login_username;
@@ -1187,6 +1187,18 @@ function generateId(){
 
   return id;
 }
+
+//. #61
+//. https://qiita.com/mas0061/items/c2e9cd0d27e09448d28e
+sanitize = {
+  encode : function (str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  },
+
+  decode : function (str) {
+    return str.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, '\'').replace(/&amp;/g, '&');
+  }
+};
 
 
 module.exports = router;

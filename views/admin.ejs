@@ -54,11 +54,11 @@ var result_quiznum = 0;
 var result_quizsetnum = 0;
 
 $(function(){
+  setTimeout( function(){
   $.ajax({
     type: 'GET',
     url: '/appid/user',
     success: function( result ){
-      //console.log( result );
       user = result.user;
       uuid = result.user.email;
       if( uuid ){
@@ -85,6 +85,7 @@ $(function(){
       $('#admin_body').html( '<h3 class="subtitle"><%= __("common.subtitle") %></h3><img src="/qdle_logo.png"/>' );  //. #43
     }
   });
+  }, 500 );
 });
 
 function reloadQuizs(){

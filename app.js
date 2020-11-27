@@ -161,13 +161,13 @@ app.get( '/appid/logout', function( req, res ){
 
 //. get user info
 app.get( '/appid/user', async function( req, res ){
-  console.log( req.user );
+  //console.log( req.user );
   if( !req.user || !req.user.sub ){
     res.status( 401 );
     res.send( '' );
   }else{
     var profile = await getProfile( req.user.sub );
-    console.log( profile );
+    //console.log( profile );
     if( profile && profile.profile ){
       res.json({
         user: {
