@@ -25,6 +25,7 @@ var settings = require( './settings' );
 app.use( session({
   secret: 'qoodle',
   resave: false,
+  cookie: { maxAge: ( 365 * 24 * 60 * 60 * 1000 ) },
   saveUninitialized: false
 }));
 
@@ -40,16 +41,6 @@ passport.use( new WebAppStrategy({
   oauthServerUrl: settings.oauthServerUrl,
   redirectUri: settings.redirectUri
 }));
-
-//. #35
-var access_token = null;
-settings.getAccessToken().then( function( token ){
-  if( token ){
-    access_token = token;
-  }
-}).catch( function( err ){
-  console.log( err );
-});
 
 /*
 app.all( '/', basicAuth( function( user, pass ){
@@ -166,21 +157,13 @@ app.get( '/appid/user', async function( req, res ){
     res.status( 401 );
     res.send( '' );
   }else{
-    var profile = await getProfile( req.user.sub );
-    //console.log( profile );
-    if( profile && profile.profile ){
-      res.json({
-        user: {
-          id: req.user.sub,
-          name: req.user.name,
-          email: req.user.email,
-          attributes: profile.profile.attributes
-        }
-      });
-    }else{
-      res.status( 401 );
-      res.send( '' );
-    }
+    res.json({
+      user: {
+        id: req.user.sub,
+        name: req.user.name,
+        email: req.user.email
+      }
+    });
   }
 });
 
@@ -281,6 +264,7 @@ function timestamp2datetime( ts ){
   }
 }
 
+//. unused..
 async function getProfile( userId ){
   return new Promise( async ( resolve, reject ) => {
     if( access_token ){
