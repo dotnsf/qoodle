@@ -47,46 +47,41 @@
 
 <script>
 var uuid = null; //generateUUID();
-var user = null;
+var user_name = '';
 var attributes_quiznum = 5;
 var attributes_quizsetnum = 1;
 var result_quiznum = 0;
 var result_quizsetnum = 0;
 
 $(function(){
-  setTimeout( function(){
-  $.ajax({
-    type: 'GET',
-    url: '/appid/user',
-    success: function( result ){
-      user = result.user;
-      uuid = result.user.email;
-      if( uuid ){
-        setUserId( uuid );
+<% if( profile && profile.id ){ %>
+  uuid = "<%= profile.email %>";
+  if( uuid ){
+    user_name = "<%= profile.name %>";
+    setUserId( uuid );
 
-        if( result.user.attributes && result.user.attributes.quiz ){
-          attributes_quiznum = result.user.attributes.quiz;
-        }
-        if( result.user.attributes && result.user.attributes.quizset ){
-          attributes_quizsetnum = result.user.attributes.quizset;
-        }
-        if( attributes_quiznum == -1 && attributes_quizsetnum == -1 ){
-          $('#navitem').html( '<a class="nav-link btn logged-paid-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
-        }else{
-          $('#navitem').html( '<a class="nav-link btn logged-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'>' + user.name + '</a>' );
-        }
-
-        reloadQuizs();
-        reloadQuizsets();
-      }
-    },
-    error: function( e0, e1, e2 ){
-      $('#navitem').html( '<a class="nav-link btn login-btn" id="login-btn" href="/appid/login"><%= __("admin.login") %></a>' );
-      $('#admin_body').html( '<h3 class="subtitle"><%= __("common.subtitle") %></h3><img src="/qdle_logo.png"/>' );  //. #43
+<%   if( profile && profile.attributes && profile.attributes.quiz ){ %>
+      attributes_quiznum = <%= profile.attributes.quiz %>;
+<%   } %>
+<%   if( profile && profile.attributes && profile.attributes.quizset ){ %>
+      attributes_quizsetnum = <%= profile.attributes.quizset %>;
+<%   } %>
+    if( attributes_quiznum == -1 && attributes_quizsetnum == -1 ){
+      $('#navitem').html( '<a class="nav-link btn logged-paid-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'><%= profile.name %></a>' );
+    }else{
+      $('#navitem').html( '<a class="nav-link btn logged-btn" id="logout-btn" href="/appid/logout" title=\'<%= __("admin.logout") %>\'><%= profile.name %></a>' );
     }
-  });
-  }, 200 );
-  //}, 500 );
+
+    reloadQuizs();
+    reloadQuizsets();
+  }else{
+    $('#navitem').html( '<a class="nav-link btn login-btn" id="login-btn" href="/appid/login"><%= __("admin.login") %></a>' );
+    $('#admin_body').html( '<h3 class="subtitle"><%= __("common.subtitle") %></h3><img src="/qdle_logo.png"/>' );  //. #43
+  }
+<% }else{ %>
+  $('#navitem').html( '<a class="nav-link btn login-btn" id="login-btn" href="/appid/login"><%= __("admin.login") %></a>' );
+  $('#admin_body').html( '<h3 class="subtitle"><%= __("common.subtitle") %></h3><img src="/qdle_logo.png"/>' );  //. #43
+<% } %>
 });
 
 function reloadQuizs(){
@@ -164,7 +159,7 @@ function saveQuiz(){
     comment: $('#edit_quiz_comment').val(),
     img_url: $('#edit_quiz_img_url').val(),
     user_id: uuid,
-    user_name: user.name
+    user_name: user_name
   };
   if( quiz_id ){
     if( attributes_quiznum == -1 || result_quiznum <= attributes_quiznum ){
@@ -215,7 +210,7 @@ function saveQuizset(){
     login_username: quizset_login_username,
     login_password: quizset_login_password,
     user_id: uuid,
-    user_name: user.name 
+    user_name: user_name 
   };
   console.log( quizset_id, data );
   if( quizset_id ){
@@ -539,7 +534,7 @@ function createQuizset(){
           login_username: '',
           login_password: '',
           user_id: uuid,
-          user_name: user.name
+          user_name: user_name
         };
         $.ajax({
           type: 'POST',

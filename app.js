@@ -147,6 +147,7 @@ app.get( '/appid/callback', function( req, res, next ){
 //. logout
 app.get( '/appid/logout', function( req, res ){
   WebAppStrategy.logout( req );
+  req.user = null;
   res.redirect( '/' );
 });
 
@@ -169,7 +170,28 @@ app.get( '/appid/user', async function( req, res ){
 
 
 app.get( '/', function( req, res ){
-  res.render( 'admin', {} );
+  if( !req.user ){
+    res.render( 'admin', { profile: null } );
+  }else{
+    if( !req.user.access_token ){
+      getAccessToken().then( function( access_token ){
+        req.user.access_token = access_token;
+        getProfile( access_token, req.user.sub ).then( function( profile ){
+          if( profile ){
+            req.user.id = profile.id;
+            req.user.attributes = JSON.parse( JSON.stringify( profile.attributes ) );
+          }
+          res.render( 'admin', { profile: req.user } );
+        }).catch( function( err2 ){
+          res.render( 'admin', { profile: req.user } );
+        });
+      }).catch( function( err1 ){
+        res.render( 'admin', { profile: req.user } );
+      });
+    }else{
+      res.render( 'admin', { profile: req.user } );
+    }
+  }
 });
 
 app.get( '/draw', function( req, res ){
@@ -264,8 +286,34 @@ function timestamp2datetime( ts ){
   }
 }
 
-//. unused..
-async function getProfile( userId ){
+async function getAccessToken(){
+  return new Promise( async ( resolve, reject ) => {
+    //. GET an IAM token
+    //. https://cloud.ibm.com/docs/appid?topic=appid-manging-api&locale=ja
+    var headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept': 'application/json'
+    };
+    var option = {
+      url: 'https://iam.cloud.ibm.com/oidc/token',
+      method: 'POST',
+      body: 'grant_type=urn:ibm:params:oauth:grant-type:apikey&apikey=' + settings.apiKey,
+      headers: headers
+    };
+    request( option, ( err, res, body ) => {
+      if( err ){
+        console.log( err );
+        reject( null );
+      }else{
+        body = JSON.parse( body );
+        var access_token = body.access_token;
+        resolve( access_token );
+      }
+    });
+  });
+}
+
+async function getProfile( access_token, user_id ){
   return new Promise( async ( resolve, reject ) => {
     if( access_token ){
       var headers1 = {
@@ -273,7 +321,7 @@ async function getProfile( userId ){
         authorization: 'Bearer ' + access_token
       };
       var option1 = {
-        url: 'https://' + settings.region + '.appid.cloud.ibm.com/management/v4/' + settings.tenantId + '/users/' + userId + '/profile',
+        url: 'https://' + settings.region + '.appid.cloud.ibm.com/management/v4/' + settings.tenantId + '/users/' + user_id + '/profile',
         method: 'GET',
         headers: headers1
       };
@@ -284,7 +332,7 @@ async function getProfile( userId ){
         }else{
           var profile = JSON.parse( body1 );
           //console.log( JSON.stringify( profile, null, 2 ) );
-          resolve( { status: true, profile: profile } );
+          resolve( profile );
         }
       });
     }else{
